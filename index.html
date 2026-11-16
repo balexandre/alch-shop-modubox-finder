@@ -22,6 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/planner.js"></script>
 <style>
   [x-cloak] { display: none !important; }
   body { background: #fafaf9; }
@@ -242,6 +243,142 @@
       </div>
     </div>
 
+    <!-- ===== PLAN A DRAWER ===== -->
+    <div x-show="tab === 'plan'">
+      <h1 class="text-2xl font-semibold tracking-tight">Plan a drawer</h1>
+      <p class="text-stone-500 mt-1 text-sm">Enter your drawer's inside size and your printer. You get a base grid layout split to fit your print bed, edge strips for the leftover gap, what box heights fit, and the full list of files to print.</p>
+
+      <div class="mt-5 grid md:grid-cols-2 gap-4">
+        <!-- inputs: drawer -->
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 space-y-3 text-sm">
+          <div class="text-xs font-medium uppercase tracking-wide text-stone-500">1 · Drawer, inside size (mm)</div>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="block"><span class="text-xs text-stone-500">Width (left–right)</span>
+              <input type="number" min="0" step="1" x-model.number="plan.W" placeholder="e.g. 400" class="mt-0.5 w-full rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1.5"></label>
+            <label class="block"><span class="text-xs text-stone-500">Depth (front–back)</span>
+              <input type="number" min="0" step="1" x-model.number="plan.D" placeholder="e.g. 300" class="mt-0.5 w-full rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1.5"></label>
+            <label class="block"><span class="text-xs text-stone-500">Height <i>(optional)</i></span>
+              <input type="number" min="0" step="1" x-model.number="plan.H" placeholder="e.g. 90" class="mt-0.5 w-full rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1.5"></label>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="block"><span class="text-xs text-stone-500">Side clearance (total per direction)</span>
+              <input type="number" min="0" step="0.5" x-model.number="plan.clear" class="mt-0.5 w-full rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1.5"></label>
+            <label class="block"><span class="text-xs text-stone-500">Top clearance</span>
+              <input type="number" min="0" step="0.5" x-model.number="plan.topClear" class="mt-0.5 w-full rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1.5"></label>
+          </div>
+          <div>
+            <div class="text-xs text-stone-500 mb-1">Leftover gap, left–right</div>
+            <div class="flex gap-1">
+              <template x-for="o in [['left','All on the left'],['split','Split both sides'],['right','All on the right']]" :key="o[0]">
+                <button @click="plan.edgeX = o[0]" class="flex-1 py-1 rounded-md border text-xs" :class="plan.edgeX === o[0] ? 'bg-stone-900 text-white border-stone-900 dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'" x-text="o[1]"></button>
+              </template>
+            </div>
+            <div class="text-xs text-stone-500 mb-1 mt-2">Leftover gap, front–back</div>
+            <div class="flex gap-1">
+              <template x-for="o in [['back','All at the back'],['split','Split both sides'],['front','All at the front']]" :key="o[0]">
+                <button @click="plan.edgeY = o[0]" class="flex-1 py-1 rounded-md border text-xs" :class="plan.edgeY === o[0] ? 'bg-stone-900 text-white border-stone-900 dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'" x-text="o[1]"></button>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- inputs: printer -->
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 space-y-3 text-sm">
+          <div class="text-xs font-medium uppercase tracking-wide text-stone-500">2 · Printer</div>
+          <select x-model="plan.printer" class="w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1.5">
+            <template x-for="g in printerGroups()" :key="g.group">
+              <optgroup :label="g.group">
+                <template x-for="p in g.items" :key="p.key"><option :value="p.key" :selected="p.key === plan.printer" x-text="p.name + ' — ' + p.x + ' × ' + p.y + ' mm'"></option></template>
+              </optgroup>
+            </template>
+          </select>
+          <p class="text-xs text-stone-500" x-show="bed()" x-text="'A tile can be up to ' + planResult().cellsPerTile?.[0] + ' × ' + planResult().cellsPerTile?.[1] + ' grid cells on this bed (max 10 × 10, the largest base grid file).'"></p>
+          <div x-show="!addPrinter">
+            <button @click="addPrinter = true" class="text-xs text-amber-600 hover:underline">+ Add my own printer</button>
+          </div>
+          <form x-show="addPrinter" @submit.prevent="saveCustomPrinter()" class="rounded-md border border-stone-200 dark:border-stone-700 p-2 space-y-2">
+            <input x-model="newPrinter.name" required placeholder="Printer name" class="w-full rounded border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1 text-xs">
+            <div class="flex gap-2 items-center text-xs">
+              <input x-model.number="newPrinter.x" type="number" min="55" required placeholder="Bed X mm" class="w-full rounded border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1">
+              <span>×</span>
+              <input x-model.number="newPrinter.y" type="number" min="55" required placeholder="Bed Y mm" class="w-full rounded border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1">
+            </div>
+            <div class="flex gap-2 text-xs"><button class="px-3 py-1 rounded bg-amber-500 text-white">Save printer</button>
+              <button type="button" @click="addPrinter = false" class="px-3 py-1 rounded border border-stone-300 dark:border-stone-700">Cancel</button></div>
+            <p class="text-[11px] text-stone-500">Saved in this browser only.</p>
+          </form>
+          <div x-show="customPrinters.length" class="text-xs">
+            <div class="text-stone-500 mb-1">My printers</div>
+            <template x-for="p in customPrinters" :key="p.name">
+              <div class="flex items-center justify-between py-0.5"><span x-text="p.name + ' — ' + p.x + ' × ' + p.y + ' mm'"></span>
+                <button @click="removeCustomPrinter(p)" class="text-stone-400 hover:text-rose-600" title="Remove">✕</button></div>
+            </template>
+          </div>
+          <p class="text-[11px] text-stone-500">Bed sizes are the printable area from the maker's specs. If yours differs, add it as your own printer.</p>
+        </div>
+      </div>
+
+      <!-- results -->
+      <div class="mt-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4" x-show="planResult().error">
+        <p class="text-sm text-stone-500" x-text="planResult().error"></p>
+      </div>
+      <div x-show="!planResult().error" class="mt-4 space-y-4">
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <div class="text-sm font-medium">3 · Layout <span class="text-stone-500 font-normal">(seen from above, front of the drawer at the bottom)</span></div>
+            <div class="text-xs text-stone-500" x-text="planSummary()"></div>
+          </div>
+          <svg class="mt-3 mx-auto block" :viewBox="planViewBox()" preserveAspectRatio="xMidYMid meet"
+            :style="`aspect-ratio: ${planResult().W || 1} / ${planResult().D || 1}; width: min(100%, ${Math.round(520 * (planResult().W || 1) / (planResult().D || 1))}px)`"
+            x-html="planSvg()" @click="$event.target.closest('[data-path]') && selectPath($event.target.closest('[data-path]').dataset.path)"></svg>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-stone-500">
+            <span><span class="inline-block w-3 h-3 rounded-sm bg-amber-400 align-middle mr-1"></span>Base grid (W×D cells)</span>
+            <span><span class="inline-block w-3 h-3 rounded-sm bg-sky-300 align-middle mr-1"></span>Edgegrid (cells + gap mm)</span>
+            <span x-show="(planResult().corners || []).length"><span class="inline-block w-3 h-3 rounded-sm bg-stone-300 align-middle mr-1"></span>Small corner left empty (no edge piece covers it)</span>
+            <span>Click a piece to see its file.</span>
+          </div>
+          <p x-show="bambuTip()" class="mt-2 text-xs rounded-md bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 px-3 py-2" x-html="bambuTip()"></p>
+        </div>
+
+        <div x-show="planResult().heights" class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 text-sm">
+          <div class="font-medium">4 · What fits in the height</div>
+          <p class="text-xs text-stone-500 mt-0.5" x-text="'Room above the base grid: ' + planResult().heights?.avail + ' mm (height − ' + plan.topClear + ' mm top clearance − 3.85 mm grid). This is conservative: it ignores the few mm that boxes sink into the grid and into each other, so you may fit slightly more.'"></p>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-3">
+            <template x-for="r in planResult().heights?.rows || []" :key="r.n">
+              <div class="rounded-lg border p-2 text-center" :class="r.stack ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30' : 'border-stone-200 dark:border-stone-800 opacity-50'">
+                <div class="font-semibold" x-text="r.n + 'H'"></div>
+                <div class="text-[11px] text-stone-500" x-text="r.h + ' mm'"></div>
+                <div class="text-xs mt-1" x-text="r.stack === 0 ? 'too tall' : r.stack === 1 ? '1 box' : r.stack + ' stacked'"></div>
+              </div>
+            </template>
+          </div>
+          <p class="text-xs mt-2" x-show="planResult().heights?.tallest" x-text="'Tallest single box: ' + planResult().heights?.tallest + 'H. Use the Stackable style to stack boxes.'"></p>
+        </div>
+
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 text-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-medium"><span x-text="planResult().heights ? '5' : '4'"></span> · Files to print <span class="text-stone-500 font-normal" x-text="'(' + planTotal() + ' pieces)'"></span></div>
+            <div class="flex gap-2">
+              <button @click="copy(planListText(), 'plan')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'plan' ? 'Copied ✓' : 'Copy list'"></button>
+              <button @click="downloadPlanCsv()" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500">Download CSV</button>
+            </div>
+          </div>
+          <table class="w-full mt-3 text-xs">
+            <thead><tr class="text-left text-stone-500"><th class="py-1 w-10">Qty</th><th>File</th><th class="hidden sm:table-cell">Folder</th></tr></thead>
+            <tbody class="divide-y divide-stone-200 dark:divide-stone-800">
+              <template x-for="l in planResult().list || []" :key="l.path">
+                <tr class="hover:bg-stone-50 dark:hover:bg-stone-800/60 cursor-pointer" @click="selectPath(l.path)">
+                  <td class="py-1.5 font-semibold" x-text="l.qty + '×'"></td>
+                  <td><span x-text="l.path.split('/').pop()"></span><span x-show="!byPath[l.path]" class="ml-1 text-rose-600" title="Not found in this release">⚠ missing</span></td>
+                  <td class="hidden sm:table-cell text-stone-500 font-mono" x-text="l.path.split('/').slice(0, -1).join('/')"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== CHANGES ===== -->
     <div x-show="tab === 'changes'" class="prose-sm max-w-none">
       <h1 class="text-2xl font-semibold tracking-tight">Release history</h1>
@@ -337,6 +474,9 @@
         </div>
     </div>
     <p class="text-[11px] text-stone-500 mt-3 leading-relaxed">Unofficial index with file locations only. The ModuBOX design and files are © Alexander Chapel. Get them at <a class="underline" href="https://www.alch.shop/" target="_blank" rel="noopener">alch.shop</a>.</p>
+    <p class="text-[11px] text-stone-500 mt-2 leading-relaxed">Want to help? This site is open source: fork
+      <a class="underline" href="https://github.com/balexandre/alch-shop-modubox-finder" target="_blank" rel="noopener">the GitHub repo</a> and send a pull request, or
+      <a class="underline" href="https://github.com/balexandre/alch-shop-modubox-finder/issues/new/choose" target="_blank" rel="noopener">open an issue</a> to report a wrong file, a naming issue or an idea.</p>
   </aside>
 </main>
 
@@ -352,7 +492,7 @@ const MEMO = {}; let TREE = null, TREE_FOR = null, VIEW = null; // kept outside 
 
 function app() {
   return {
-    tabs: [{ id: 'find', label: 'Find a box' }, { id: 'search', label: 'Search' }, { id: 'browse', label: 'Browse' }, { id: 'changes', label: 'Changes' }],
+    tabs: [{ id: 'find', label: 'Find a box' }, { id: 'plan', label: 'Plan a drawer' }, { id: 'search', label: 'Search' }, { id: 'browse', label: 'Browse' }, { id: 'changes', label: 'Changes' }],
     tab: 'find', ready: false, versions: [], version: null, root: '01_ModuBOX - Master set',
     items: [], folders: [], guides: {}, byPath: {},
     q: '', cat: '', kind: '', limit: 100,
@@ -396,6 +536,10 @@ function app() {
     theme: savedTheme(),
     localRoot: (() => { try { return localStorage.getItem('localRoot') || ''; } catch { return ''; } })(),
     editRoot: false,
+    plan: Object.assign({ W: '', D: '', H: '', clear: 1, topClear: 2, printer: 'Bambu Lab|A1', edgeX: 'split', edgeY: 'split' },
+      (() => { try { return JSON.parse(localStorage.getItem('plan') || '{}'); } catch { return {}; } })()),
+    customPrinters: (() => { try { return JSON.parse(localStorage.getItem('printers') || '[]'); } catch { return []; } })(),
+    addPrinter: false, newPrinter: { name: '', x: '', y: '' },
     showNotice: (() => {
       const local = ['localhost', '127.0.0.1', '[::1]', ''].includes(location.hostname) || location.hostname.endsWith('.localhost');
       if (local) return false;
@@ -411,6 +555,7 @@ function app() {
       this.version = this.versions[0].version;
       await this.loadVersion();
       this.$watch('q', () => { this.limit = 100; });
+      this.$watch('plan', v => { try { localStorage.setItem('plan', JSON.stringify(v)); } catch {} });
       this.$watch('tab', t => t === 'search' && this.$nextTick(() => this.$refs.q.focus()));
       this.initViewer();
       const h = new URLSearchParams(location.hash.slice(1));
@@ -562,6 +707,76 @@ function app() {
     },
     warnCount() { return this.memo('w', [this.version], () => this.items.filter(i => i.a.warn).length); },
     REPO,
+    // ---- drawer planner (logic in js/planner.js) ----
+    allPrinters() {
+      return [...PRINTERS.map(p => ({ ...p, key: p.group + '|' + p.name })),
+              ...this.customPrinters.map(p => ({ ...p, group: 'My printers', key: 'My printers|' + p.name }))];
+    },
+    printerGroups() {
+      const g = {}; for (const p of this.allPrinters()) (g[p.group] ??= []).push(p);
+      return Object.entries(g).map(([group, items]) => ({ group, items }));
+    },
+    bed() { return this.allPrinters().find(p => p.key === this.plan.printer) || null; },
+    saveCustomPrinter() {
+      const p = { name: this.newPrinter.name.trim(), x: +this.newPrinter.x, y: +this.newPrinter.y };
+      if (!p.name || !(p.x >= 55) || !(p.y >= 55)) return;
+      this.customPrinters = [...this.customPrinters.filter(c => c.name !== p.name), p];
+      try { localStorage.setItem('printers', JSON.stringify(this.customPrinters)); } catch {}
+      this.plan.printer = 'My printers|' + p.name; this.addPrinter = false; this.newPrinter = { name: '', x: '', y: '' };
+    },
+    removeCustomPrinter(p) {
+      this.customPrinters = this.customPrinters.filter(c => c.name !== p.name);
+      try { localStorage.setItem('printers', JSON.stringify(this.customPrinters)); } catch {}
+      if (this.plan.printer === 'My printers|' + p.name) this.plan.printer = 'Bambu Lab|A1';
+    },
+    planResult() {
+      const b = this.bed();
+      return this.memo('plan', [this.plan, b && [b.x, b.y]], () => planDrawer({ ...this.plan, bedX: b?.x, bedY: b?.y }));
+    },
+    planViewBox() { const r = this.planResult(); const m = Math.max(r.W || 100, r.D || 100) * 0.01; return `${-m} ${-m} ${(r.W || 100) + 2 * m} ${(r.D || 100) + 2 * m}`; },
+    planStroke() { const r = this.planResult(); return Math.max(r.W || 100, r.D || 100) / 400; },
+    planFont() { const r = this.planResult(); return Math.max(r.W || 100, r.D || 100) / 28; },
+    planSummary() {
+      const r = this.planResult(); if (r.error) return '';
+      const g = r.gaps, side = (a, b, la, lb) => (a && b) ? `${a} + ${b} mm` : a ? `${a} mm ${la}` : b ? `${b} mm ${lb}` : 'no gap';
+      return `${r.nx} × ${r.ny} grid (${r.gridW} × ${r.gridD} mm) · left–right ${side(g.left, g.right, 'left', 'right')} · front–back ${side(g.back, g.front, 'back', 'front')}`;
+    },
+    // SVG built as markup: Alpine's <template x-for> does not work inside <svg>.
+    planSvg() {
+      const r = this.planResult(); if (r.error) return '';
+      const sw = this.planStroke(), fs = this.planFont(), esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const label = (x, y, w, d, t, size, cls) => `<text x="${x + w / 2}" y="${y + d / 2}" text-anchor="middle" dominant-baseline="central" font-size="${size}" class="${cls}" pointer-events="none">${esc(t)}</text>`;
+      let o = `<rect x="0" y="0" width="${r.W}" height="${r.D}" class="fill-stone-100 dark:fill-stone-800 stroke-stone-400" stroke-width="${sw * 2}"/>`;
+      r.tiles.forEach((t, i) => {
+        o += `<g data-path="${esc(t.path)}" class="cursor-pointer"><title>${esc(t.path.split('/').pop())}</title><rect x="${t.x}" y="${t.y}" width="${t.w}" height="${t.d}" stroke-width="${sw}" class="${i % 2 ? 'fill-amber-300 dark:fill-amber-700' : 'fill-amber-400 dark:fill-amber-600'} stroke-amber-900 hover:fill-amber-500"/>`
+          + label(t.x, t.y, t.w, t.d, `${t.a}×${t.b}`, fs, 'fill-amber-950 dark:fill-amber-50') + '</g>';
+      });
+      for (const e of r.edges) {
+        o += `<g data-path="${esc(e.path)}" class="cursor-pointer"><title>${esc(e.path.split('/').pop())}</title><rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.d}" stroke-width="${sw}" class="fill-sky-300 dark:fill-sky-700 stroke-sky-900 hover:fill-sky-400"/>`
+          + label(e.x, e.y, e.w, e.d, `${e.n}+${e.gap}`, Math.min(fs * 0.8, Math.min(e.w, e.d) * 0.7), 'fill-sky-950 dark:fill-sky-50') + '</g>';
+      }
+      for (const c of r.corners) o += `<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${c.d}" class="fill-stone-300 dark:fill-stone-600" opacity="0.6"/>`;
+      return o;
+    },
+    planTotal() { return (this.planResult().list || []).reduce((s, l) => s + l.qty, 0); },
+    planListText() {
+      const r = this.planResult();
+      return [`ModuBOX drawer plan: ${r.W} × ${r.D} mm (${this.planSummary()})`, ...(r.list || []).map(l => `${l.qty} × ${this.root}/${l.path}`)].join('\n');
+    },
+    downloadPlanCsv() {
+      const rows = [['qty', 'file', 'folder'], ...(this.planResult().list || []).map(l => [l.qty, l.path.split('/').pop(), l.path.split('/').slice(0, -1).join('/')])];
+      const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = `modubox-drawer-${this.planResult().W}x${this.planResult().D}.csv`; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    },
+    bambuTip() {
+      const b = this.bed(); if (!b?.bambu) return '';
+      const f = `01_Boxes and grids/01_Print files/Base grids_${b.bambu}.3mf`;
+      return this.byPath[f] ? `<b>Bambu tip:</b> <span class="font-mono">${f}</span> is a ready-made project with base grids for your ${b.name}.` : '';
+    },
+    selectPath(p) { if (this.byPath[p]) this.select(this.byPath[p]); },
     docFor(it) { return it ? this.docs[it.folder + '/' + it.name] : null; },
     guideFor(p) {
       if (p == null) return null;

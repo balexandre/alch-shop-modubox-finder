@@ -30,7 +30,12 @@ await p.getByRole('button', { name: 'Cut-away' }).click(); await shot('2-dark');
 await p.getByRole('button', { name: 'Search', exact: true }).first().click();
 await p.locator('input[type=search]').fill('stack 2x3 4h'); await p.waitForTimeout(400); await shot('3-search');
 await p.getByRole('button', { name: 'Browse', exact: true }).first().click(); await p.waitForTimeout(300); await shot('4-browse');
-await p.goto(U + '#f=' + encodeURIComponent('Case cart (for v1)/ModuBOX case cart.pdf')); await p.reload(); await p.waitForTimeout(2000); await shot('5-deeplink');
+await p.getByRole('button', { name: 'Plan a drawer', exact: true }).first().click();
+const nums = p.locator('div[x-show="tab === \'plan\'"] input[type=number]');
+await nums.nth(0).fill('560'); await nums.nth(1).fill('470'); await nums.nth(2).fill('120'); await p.waitForTimeout(400);
+if (await p.locator('svg [data-path]').count() < 1) errs.push('Plan a drawer drew no pieces');
+await shot('5-plan');
+await p.goto(U + '#f=' + encodeURIComponent('Case cart (for v1)/ModuBOX case cart.pdf')); await p.reload(); await p.waitForTimeout(2000); await shot('6-deeplink');
 
 console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'NO ERRORS', '\nScreenshots in', OUT);
 await b.close();

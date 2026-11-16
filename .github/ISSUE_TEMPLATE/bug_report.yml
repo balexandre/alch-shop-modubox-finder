@@ -1,0 +1,27 @@
+name: Bug report
+description: Something on the site doesn't work or shows the wrong thing
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: Use "Share link" on the file, or copy the page URL.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: e.g. Chrome 131 on Windows 11
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors (optional)
+      description: Press F12, open the Console tab and paste any red errors.
+      render: text

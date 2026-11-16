@@ -1,0 +1,27 @@
+name: Wrong file info or naming issue
+description: A file is in the wrong place, has the wrong name or size, or a how-to note is wrong
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: "Please don't attach any files from the Master set. Just tell us the folder and file name."
+  - type: input
+    id: path
+    attributes:
+      label: Folder and file name
+      placeholder: 01_Boxes and grids/ModuBOXES/Stackable/Stack_4H75mm/ModuBOX_Stack_5H93_1x1.STL
+    validations:
+      required: true
+  - type: input
+    id: release
+    attributes:
+      label: Master set release
+      description: Shown in the release selector at the top of the site.
+      placeholder: May 26th release
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong?
+      description: For a size or height problem, include what you measured in your slicer (W × D × H mm).
+    validations:
+      required: true

@@ -17,6 +17,8 @@ The 3D preview in the detail panel is a box generated from the file name, not th
   The theme button cycles system → light → dark and saves the choice in `localStorage.theme`.
   The optional local Master set path is saved in `localStorage.localRoot` and used by "Copy path".
 - Label generator: https://label.alch.shop has box types Regular / Stackable / ALEX and a width in grid units. It has no URL parameters, so `labelHint()` in index.html tells the user what to pick. Assumption to verify: label width = the first number (W) in WxD.
+- `js/planner.js`: pure drawer-planner logic (`planDrawer`, the `PRINTERS` bed presets). Tiles are split into the fewest near-equal parts that fit the bed (max 10 cells, BaseGrid files only exist as AxB with A ≤ B). Edgegrids are N×55 mm long and exactly gap-mm wide, so the corners where two strips meet stay empty. Height advice is deliberately conservative. The Plan a drawer tab draws its SVG with `x-html`, because `<template x-for>` doesn't work inside `<svg>`. Custom printers are saved in `localStorage.printers` and drawer inputs in `localStorage.plan`.
+- `.github/`: PR template (its main rule is no Master set files) and issue forms (bug, wrong file info / naming issue, idea).
 - `tools/render_thumbs.mjs`: dependency-free Node STL renderer. It writes `img/styles/<style>{,-under,-section}.png` (top, underside and cut-away views) from the representative files listed in its `PICKS` map. Re-run it when a style changes, then check the pictures.
 - `data/docs.json`: title, page count, description and tags for each PDF/PNG, keyed by path relative to the Master set root. Its text is included in search.
 - `tools/build_index.py`: scans a local Master set folder and writes everything under `data/`, `docs/`, `changes/`.

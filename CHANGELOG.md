@@ -24,5 +24,7 @@ The full per-file diff is in `changes/<version>.md`.
 - Fixed: Browse crashed on load (tree read before the index loaded), the detail panel threw Alpine x-for errors, and Find a box could show 0 files from a stale cache. Shared links now open Browse at the file's folder. Added `tools/check_site.mjs` (headless smoke test).
 - The preview placeholder now depends on the file type (PDF → browser or PDF reader, PNG → image viewer, 3MF → Bambu Studio, STL → slicer).
 - Favicon matching the header logo. The Changes tab and the file warnings link to the naming-issues list, and the .md links open on GitHub.
+- New **Plan a drawer** tab: enter the drawer size (and optionally height) and pick a printer, or add your own. It gives base grid tiles split to fit the bed, edge strips placed left/right/split and front/back/split, which box heights and stacks fit, and a printable file list (copy or CSV). Clicking a piece shows its file.
+- Footer invites contributions (fork, PR, issues). Added a PR template and issue forms.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.
