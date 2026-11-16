@@ -296,7 +296,7 @@
               </optgroup>
             </template>
           </select>
-          <p class="text-xs text-stone-500" x-show="bed()" x-text="'A tile can be up to ' + planResult().cellsPerTile?.[0] + ' × ' + planResult().cellsPerTile?.[1] + ' grid cells on this bed (max 10 × 10, the largest base grid file).'"></p>
+          <p class="text-xs text-stone-500" x-show="bed()" x-text="bedCellsText()"></p>
           <div x-show="!addPrinter">
             <button @click="addPrinter = true" class="text-xs text-amber-600 hover:underline">+ Add my own printer</button>
           </div>
@@ -748,6 +748,14 @@ function app() {
     planResult() {
       const b = this.bed();
       return this.memo('plan', [this.plan, b && [b.x, b.y]], () => planDrawer({ ...this.plan, bedX: b?.x, bedY: b?.y }));
+    },
+    // Largest base grid tile for the bed. Depends only on the bed, so it works before a drawer size is entered.
+    bedCellsText() {
+      const b = this.bed(); if (!b) return '';
+      const cells = mm => Math.min(PLAN.MAX_CELLS, Math.floor((mm + 0.1) / PLAN.GRID));
+      const [big, small] = [cells(Math.max(b.x, b.y)), cells(Math.min(b.x, b.y))];
+      if (small < 1) return `This bed is smaller than one ${PLAN.GRID} mm grid cell.`;
+      return `A base grid tile can be up to ${big} × ${small} grid cells (${big * PLAN.GRID} × ${small * PLAN.GRID} mm) on this bed. The largest base grid file is 10 × 10.`;
     },
     planViewBox() { const r = this.planResult(); const m = Math.max(r.W || 100, r.D || 100) * 0.01; return `${-m} ${-m} ${(r.W || 100) + 2 * m} ${(r.D || 100) + 2 * m}`; },
     planStroke() { const r = this.planResult(); return Math.max(r.W || 100, r.D || 100) / 400; },
