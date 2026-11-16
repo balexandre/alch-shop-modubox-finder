@@ -57,6 +57,9 @@ The 3D preview in the detail panel is a box generated from the file name, not th
 6. Update `data/guides.json` for new or renamed folders, and update the parsing rules in `build_index.py` for new naming patterns.
 7. Test locally with `python3 -m http.server 8765`, then run `node tools/check_site.mjs` (headless Chromium smoke test; it must print NO ERRORS) and look at its screenshots.
 
+## URL routing
+`#<view>[&f=<file>][&q=<search>][&d=<folder>]`, built by `routeHash()` and read by `applyRoute()`. Tab changes `pushState`; selection, search and folder changes `replaceState`. The `ROUTING` flag stops watchers from writing back while a URL is being applied. Old `#f=` and `#q=` links infer the view. A route with no `f` clears the selection.
+
 ## Alpine gotchas (learned the hard way)
 - Computed helpers run before the index has loaded. Return empty values then, never `null`.
 - `memo()` keys include `items.length`, so results computed before the data arrived are never reused.

@@ -503,6 +503,7 @@ const REPO = 'https://github.com/balexandre/alch-shop-modubox-finder/blob/master
 const EMPTY_ITEM = Object.freeze({ name: '', folder: '', kind: '', size: 0, a: {} });
 const EMPTY_DOC = { title: '', description: '', pages: 0, tags: [] };
 const EMPTY_GUIDE = { title: '', summary: '', steps: [], draft: false };
+let ROUTING = false;   // true while applying a URL, so watchers don't write it back
 const MEMO = {}; let TREE = null, TREE_FOR = null, VIEW = null; // kept outside Alpine's reactive state
 
 function app() {
@@ -572,14 +573,56 @@ function app() {
       this.version = this.versions[0].version;
       await this.loadVersion();
       this.$watch('q', () => { this.limit = 100; });
-      if (this.plan.printer === 'Bambu Lab|H2D (both nozzles)') this.plan.printer = 'Bambu Lab|H2D, single nozzle (one colour)';   // old, mislabelled preset
+      const renamed = { 'Bambu Lab|H2D (both nozzles)': 'Bambu Lab|H2D, single nozzle',          // old, mislabelled preset
+        'Bambu Lab|H2D, single nozzle (one colour)': 'Bambu Lab|H2D, single nozzle', 'Bambu Lab|H2D, both nozzles (multi-colour)': 'Bambu Lab|H2D, both nozzles' };
+      if (renamed[this.plan.printer]) this.plan.printer = renamed[this.plan.printer];
       if (!this.bed()) this.plan.printer = 'Bambu Lab|A1';
       this.$watch('plan', v => { try { localStorage.setItem('plan', JSON.stringify(v)); } catch {} });
       this.$watch('tab', t => t === 'search' && this.$nextTick(() => this.$refs.q.focus()));
       this.initViewer();
-      const h = new URLSearchParams(location.hash.slice(1));
-      if (h.get('f') && this.byPath[h.get('f')]) { const it = this.byPath[h.get('f')]; this.goFolder(it.folder); this.select(it); }
-      if (h.get('q')) { this.q = h.get('q'); this.tab = 'search'; }
+      this.applyRoute(location.hash);
+      history.replaceState(null, '', this.routeHash());
+      // Tab changes add a history entry (Back/Forward move between views); everything else updates the current one.
+      this.$watch('tab', t => {
+        if (!ROUTING && t === 'browse' && this.selected) this.goFolder(this.selected.folder);   // Browse opens where the selected file is
+        this.updateUrl(true);
+      });
+      for (const k of ['q', 'folder', 'selected']) this.$watch(k, () => this.updateUrl(false));
+      addEventListener('popstate', () => this.applyRoute(location.hash));
+    },
+
+    // ---- URL routing: #<view>[&f=<file>][&q=<search>][&d=<folder>] ----
+    // Older links (#f=... / #q=...) still work: the view is inferred.
+    clearSelection() {
+      this.selected = null;
+      if (VIEW) while (VIEW.group.children.length) VIEW.group.remove(VIEW.group.children[0]);
+    },
+    routeHash() {
+      const parts = [this.tab];
+      if (this.tab === 'search' && this.q) parts.push('q=' + encodeURIComponent(this.q));
+      if (this.tab === 'browse' && this.folder && !(this.selected && this.selected.folder === this.folder)) parts.push('d=' + encodeURIComponent(this.folder));
+      if (this.selected && this.tab !== 'plan' && this.tab !== 'changes') parts.push('f=' + encodeURIComponent(this.selected.folder + '/' + this.selected.name));
+      return '#' + parts.join('&');
+    },
+    updateUrl(push) {
+      if (ROUTING) return;
+      const h = this.routeHash();
+      if (h === location.hash) return;
+      push ? history.pushState(null, '', h) : history.replaceState(null, '', h);
+    },
+    applyRoute(hash) {
+      ROUTING = true;
+      try {
+        const h = new URLSearchParams(hash.replace(/^#/, ''));
+        const ids = this.tabs.map(t => t.id);
+        let view = [...h.keys()].find(k => ids.includes(k) && !h.get(k));
+        const it = h.get('f') && this.byPath[h.get('f')];
+        if (h.get('d') && this.folders.some(f => f.p === h.get('d'))) this.goFolder(h.get('d'));
+        if (it) { if (!view || view === 'browse') this.goFolder(it.folder); this.select(it); view ??= 'browse'; }
+        else this.clearSelection();
+        if (h.has('q')) { this.q = h.get('q') || ''; view ??= 'search'; }
+        this.tab = view || 'find';
+      } finally { this.$nextTick(() => { ROUTING = false; }); }
     },
     async loadVersion() {
       const ix = await (await fetch(`data/versions/${this.version}.json`)).json();
@@ -829,7 +872,6 @@ function app() {
     select(it) {
       if (!it) return;
       this.selected = it;
-      history.replaceState(null, '', '#f=' + encodeURIComponent(it.folder + '/' + it.name));
       this.drawPreview(it.a);
     },
     crumbs() {

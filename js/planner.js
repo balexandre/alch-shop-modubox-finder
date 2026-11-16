@@ -13,8 +13,8 @@ const PRINTERS = [
   { group: 'Bambu Lab', name: 'P1S', x: 256, y: 256, bambu: 'P1S' },
   { group: 'Bambu Lab', name: 'X1 Carbon / X1E', x: 256, y: 256, bambu: 'X1C' },
   // H2D: 325 x 320 with one nozzle, 300 x 320 with both. The 350 mm "total" can't be used by a single nozzle.
-  { group: 'Bambu Lab', name: 'H2D, single nozzle (one colour)', x: 325, y: 320, bambu: 'H2D' },
-  { group: 'Bambu Lab', name: 'H2D, both nozzles (multi-colour)', x: 300, y: 320, bambu: 'H2D' },
+  { group: 'Bambu Lab', name: 'H2D, single nozzle', x: 325, y: 320, bambu: 'H2D' },
+  { group: 'Bambu Lab', name: 'H2D, both nozzles', x: 300, y: 320, bambu: 'H2D' },
   { group: 'Bambu Lab', name: 'H2S', x: 340, y: 320, bambu: 'H2S' },
   { group: 'Prusa', name: 'MINI+', x: 180, y: 180 },
   { group: 'Prusa', name: 'MK4 / MK4S', x: 250, y: 210 },
