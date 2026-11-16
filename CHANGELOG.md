@@ -9,7 +9,8 @@ The full per-file diff is in `changes/<version>.md`.
 
 **Known quirks in the source files**
 - Stackable 4H and 5H files have the wrong height in their names. The folder is correct (verified by measuring).
-- `organizers/four cup 2x3` contains a bottom named `2x2`.
+- `organizers/four cup 2x3` contains a bottom named `2x2`. It measures 164.5 mm wide, so it is really the 2x3 bottom.
+- Full verified rename list (161 files): `docs/naming-issues-2026-05-26.md` / `.csv`.
 
 **Site**
 - First mockup: Find a box (style → height → footprint matrix), Search (sizes like `2x3`, heights like `4h`, `ø55`, free text), Browse (folder tree with guides), and a 3D preview generated from the file name.
@@ -22,5 +23,6 @@ The full per-file diff is in `changes/<version>.md`.
 - The theme button is now the rightmost header control.
 - Fixed: Browse crashed on load (tree read before the index loaded), the detail panel threw Alpine x-for errors, and Find a box could show 0 files from a stale cache. Shared links now open Browse at the file's folder. Added `tools/check_site.mjs` (headless smoke test).
 - The preview placeholder now depends on the file type (PDF → browser or PDF reader, PNG → image viewer, 3MF → Bambu Studio, STL → slicer).
+- Favicon matching the header logo. The Changes tab and the file warnings link to the naming-issues list, and the .md links open on GitHub.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.

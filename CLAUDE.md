@@ -36,7 +36,9 @@ The 3D preview in the detail panel is a box generated from the file name, not th
   - Stackable = Regular plus a chamfered inner lip at the top. The cut-away picture shows it.
   - Split 4H 2x2 is vertex-identical to Regular 4H 2x2. Split only means "use the ModuBOX_Split Bambu print profile".
 - Guide warnings can be version-keyed (`"warn": {"2026-05-26": "..."}`), and they only show for that release.
-- `organizers/four cup 2x3/` contains `Four cup_Bottom 2x2.STL` (could be a mislabel; unverified).
+- `organizers/four cup 2x3/` contains `Four cup_Bottom 2x2.STL`, but it measures 164.5 mm wide: it is the 2x3 bottom (verified). The builder flags folder-vs-name size mismatches too.
+- `docs/naming-issues-<version>.md` and `.csv` hold the verified rename list (161 files in 2026-05-26). Regenerate it per release by measuring the flagged STLs' bounding boxes.
+- `.md` links on the site point to the GitHub blob view (`REPO` constant), because Pages serves Markdown as raw text.
 
 ## Index record format (`data/versions/<date>.json`)
 `{version,label,generated,gridMm,stats,folders:[{p:"rel/folder",files:[{n:name,k:kind,s:bytes,a:attrs}]}]}`

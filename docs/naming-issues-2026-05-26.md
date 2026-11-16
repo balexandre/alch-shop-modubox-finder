@@ -1,0 +1,194 @@
+# Naming issues in the 2026-05-26 Master set
+
+Files whose name doesn't match their folder or their real size. Every entry was checked by measuring the STL's bounding box (W × D × H, in mm).
+Only the names are wrong; the models themselves are fine. A spreadsheet-friendly copy is in `naming-issues-2026-05-26.csv`.
+
+## Summary
+
+| Folder | Files | Current name pattern | Should be | Measured height |
+|---|---|---|---|---|
+| `01_Boxes and grids/ModuBOXES/Stackable/Stack_4H75mm/` | 80 | `ModuBOX_Stack_5H93_<W>x<D>.STL` | `ModuBOX_Stack_4H75_<W>x<D>.STL` | 75 mm (4H) |
+| `01_Boxes and grids/ModuBOXES/Stackable/Stack_5H93mm/` | 80 | `ModuBOX_Stack_6H93_<W>x<D>.STL` | `ModuBOX_Stack_5H93_<W>x<D>.STL` | 93 mm (5H) |
+| `organizers/four cup 2x3/` | 1 | `ModuBOX - Four cup_Bottom 2x2.STL` | `ModuBOX - Four cup_Bottom 2x3.STL` | 164.5 × 62.2 × 109.5 mm |
+
+Every Stackable file's width and depth match the W×D in its name (checked against 55 mm × units − 0.2 mm).
+
+**Rename order matters.** The 4H folder's files are currently called `…_5H93_…`, which is what the 5H folder's files will be called after the fix. If you ever copy both folders into one place, rename the 4H folder's files first so nothing gets overwritten.
+
+## Full list
+
+### `01_Boxes and grids/ModuBOXES/Stackable/Stack_4H75mm/` (80)
+
+| Current | Should be | Measured (mm) |
+|---|---|---|
+| `ModuBOX_Stack_5H93_1x1.STL` | `ModuBOX_Stack_4H75_1x1.STL` | 54.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_1x2.STL` | `ModuBOX_Stack_4H75_1x2.STL` | 54.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_1x3.STL` | `ModuBOX_Stack_4H75_1x3.STL` | 54.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_1x4.STL` | `ModuBOX_Stack_4H75_1x4.STL` | 54.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_1x5.STL` | `ModuBOX_Stack_4H75_1x5.STL` | 54.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_1x6.STL` | `ModuBOX_Stack_4H75_1x6.STL` | 54.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_1x7.STL` | `ModuBOX_Stack_4H75_1x7.STL` | 54.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_1x8.STL` | `ModuBOX_Stack_4H75_1x8.STL` | 54.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_1x9.STL` | `ModuBOX_Stack_4H75_1x9.STL` | 54.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_1x10.STL` | `ModuBOX_Stack_4H75_1x10.STL` | 54.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_2x1.STL` | `ModuBOX_Stack_4H75_2x1.STL` | 109.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_2x2.STL` | `ModuBOX_Stack_4H75_2x2.STL` | 109.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_2x3.STL` | `ModuBOX_Stack_4H75_2x3.STL` | 109.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_2x4.STL` | `ModuBOX_Stack_4H75_2x4.STL` | 109.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_2x5.STL` | `ModuBOX_Stack_4H75_2x5.STL` | 109.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_2x6.STL` | `ModuBOX_Stack_4H75_2x6.STL` | 109.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_2x7.STL` | `ModuBOX_Stack_4H75_2x7.STL` | 109.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_2x8.STL` | `ModuBOX_Stack_4H75_2x8.STL` | 109.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_2x9.STL` | `ModuBOX_Stack_4H75_2x9.STL` | 109.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_2x10.STL` | `ModuBOX_Stack_4H75_2x10.STL` | 109.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_3x1.STL` | `ModuBOX_Stack_4H75_3x1.STL` | 164.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_3x2.STL` | `ModuBOX_Stack_4H75_3x2.STL` | 164.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_3x3.STL` | `ModuBOX_Stack_4H75_3x3.STL` | 164.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_3x4.STL` | `ModuBOX_Stack_4H75_3x4.STL` | 164.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_3x5.STL` | `ModuBOX_Stack_4H75_3x5.STL` | 164.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_3x6.STL` | `ModuBOX_Stack_4H75_3x6.STL` | 164.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_3x7.STL` | `ModuBOX_Stack_4H75_3x7.STL` | 164.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_3x8.STL` | `ModuBOX_Stack_4H75_3x8.STL` | 164.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_3x9.STL` | `ModuBOX_Stack_4H75_3x9.STL` | 164.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_3x10.STL` | `ModuBOX_Stack_4H75_3x10.STL` | 164.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_4x1.STL` | `ModuBOX_Stack_4H75_4x1.STL` | 219.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_4x2.STL` | `ModuBOX_Stack_4H75_4x2.STL` | 219.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_4x3.STL` | `ModuBOX_Stack_4H75_4x3.STL` | 219.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_4x4.STL` | `ModuBOX_Stack_4H75_4x4.STL` | 219.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_4x5.STL` | `ModuBOX_Stack_4H75_4x5.STL` | 219.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_4x6.STL` | `ModuBOX_Stack_4H75_4x6.STL` | 219.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_4x7.STL` | `ModuBOX_Stack_4H75_4x7.STL` | 219.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_4x8.STL` | `ModuBOX_Stack_4H75_4x8.STL` | 219.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_4x9.STL` | `ModuBOX_Stack_4H75_4x9.STL` | 219.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_4x10.STL` | `ModuBOX_Stack_4H75_4x10.STL` | 219.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_5x1.STL` | `ModuBOX_Stack_4H75_5x1.STL` | 274.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_5x2.STL` | `ModuBOX_Stack_4H75_5x2.STL` | 274.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_5x3.STL` | `ModuBOX_Stack_4H75_5x3.STL` | 274.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_5x4.STL` | `ModuBOX_Stack_4H75_5x4.STL` | 274.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_5x5.STL` | `ModuBOX_Stack_4H75_5x5.STL` | 274.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_5x6.STL` | `ModuBOX_Stack_4H75_5x6.STL` | 274.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_5x7.STL` | `ModuBOX_Stack_4H75_5x7.STL` | 274.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_5x8.STL` | `ModuBOX_Stack_4H75_5x8.STL` | 274.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_5x9.STL` | `ModuBOX_Stack_4H75_5x9.STL` | 274.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_5x10.STL` | `ModuBOX_Stack_4H75_5x10.STL` | 274.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_6x1.STL` | `ModuBOX_Stack_4H75_6x1.STL` | 329.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_6x2.STL` | `ModuBOX_Stack_4H75_6x2.STL` | 329.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_6x3.STL` | `ModuBOX_Stack_4H75_6x3.STL` | 329.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_6x4.STL` | `ModuBOX_Stack_4H75_6x4.STL` | 329.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_6x5.STL` | `ModuBOX_Stack_4H75_6x5.STL` | 329.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_6x6.STL` | `ModuBOX_Stack_4H75_6x6.STL` | 329.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_6x7.STL` | `ModuBOX_Stack_4H75_6x7.STL` | 329.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_6x8.STL` | `ModuBOX_Stack_4H75_6x8.STL` | 329.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_6x9.STL` | `ModuBOX_Stack_4H75_6x9.STL` | 329.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_6x10.STL` | `ModuBOX_Stack_4H75_6x10.STL` | 329.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_7x1.STL` | `ModuBOX_Stack_4H75_7x1.STL` | 384.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_7x2.STL` | `ModuBOX_Stack_4H75_7x2.STL` | 384.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_7x3.STL` | `ModuBOX_Stack_4H75_7x3.STL` | 384.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_7x4.STL` | `ModuBOX_Stack_4H75_7x4.STL` | 384.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_7x5.STL` | `ModuBOX_Stack_4H75_7x5.STL` | 384.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_7x6.STL` | `ModuBOX_Stack_4H75_7x6.STL` | 384.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_7x7.STL` | `ModuBOX_Stack_4H75_7x7.STL` | 384.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_7x8.STL` | `ModuBOX_Stack_4H75_7x8.STL` | 384.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_7x9.STL` | `ModuBOX_Stack_4H75_7x9.STL` | 384.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_7x10.STL` | `ModuBOX_Stack_4H75_7x10.STL` | 384.8 x 549.8 x 75 |
+| `ModuBOX_Stack_5H93_8x1.STL` | `ModuBOX_Stack_4H75_8x1.STL` | 439.8 x 54.8 x 75 |
+| `ModuBOX_Stack_5H93_8x2.STL` | `ModuBOX_Stack_4H75_8x2.STL` | 439.8 x 109.8 x 75 |
+| `ModuBOX_Stack_5H93_8x3.STL` | `ModuBOX_Stack_4H75_8x3.STL` | 439.8 x 164.8 x 75 |
+| `ModuBOX_Stack_5H93_8x4.STL` | `ModuBOX_Stack_4H75_8x4.STL` | 439.8 x 219.8 x 75 |
+| `ModuBOX_Stack_5H93_8x5.STL` | `ModuBOX_Stack_4H75_8x5.STL` | 439.8 x 274.8 x 75 |
+| `ModuBOX_Stack_5H93_8x6.STL` | `ModuBOX_Stack_4H75_8x6.STL` | 439.8 x 329.8 x 75 |
+| `ModuBOX_Stack_5H93_8x7.STL` | `ModuBOX_Stack_4H75_8x7.STL` | 439.8 x 384.8 x 75 |
+| `ModuBOX_Stack_5H93_8x8.STL` | `ModuBOX_Stack_4H75_8x8.STL` | 439.8 x 439.8 x 75 |
+| `ModuBOX_Stack_5H93_8x9.STL` | `ModuBOX_Stack_4H75_8x9.STL` | 439.8 x 494.8 x 75 |
+| `ModuBOX_Stack_5H93_8x10.STL` | `ModuBOX_Stack_4H75_8x10.STL` | 439.8 x 549.8 x 75 |
+
+### `01_Boxes and grids/ModuBOXES/Stackable/Stack_5H93mm/` (80)
+
+| Current | Should be | Measured (mm) |
+|---|---|---|
+| `ModuBOX_Stack_6H93_1x1.STL` | `ModuBOX_Stack_5H93_1x1.STL` | 54.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_1x2.STL` | `ModuBOX_Stack_5H93_1x2.STL` | 54.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_1x3.STL` | `ModuBOX_Stack_5H93_1x3.STL` | 54.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_1x4.STL` | `ModuBOX_Stack_5H93_1x4.STL` | 54.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_1x5.STL` | `ModuBOX_Stack_5H93_1x5.STL` | 54.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_1x6.STL` | `ModuBOX_Stack_5H93_1x6.STL` | 54.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_1x7.STL` | `ModuBOX_Stack_5H93_1x7.STL` | 54.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_1x8.STL` | `ModuBOX_Stack_5H93_1x8.STL` | 54.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_1x9.STL` | `ModuBOX_Stack_5H93_1x9.STL` | 54.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_1x10.STL` | `ModuBOX_Stack_5H93_1x10.STL` | 54.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_2x1.STL` | `ModuBOX_Stack_5H93_2x1.STL` | 109.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_2x2.STL` | `ModuBOX_Stack_5H93_2x2.STL` | 109.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_2x3.STL` | `ModuBOX_Stack_5H93_2x3.STL` | 109.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_2x4.STL` | `ModuBOX_Stack_5H93_2x4.STL` | 109.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_2x5.STL` | `ModuBOX_Stack_5H93_2x5.STL` | 109.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_2x6.STL` | `ModuBOX_Stack_5H93_2x6.STL` | 109.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_2x7.STL` | `ModuBOX_Stack_5H93_2x7.STL` | 109.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_2x8.STL` | `ModuBOX_Stack_5H93_2x8.STL` | 109.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_2x9.STL` | `ModuBOX_Stack_5H93_2x9.STL` | 109.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_2x10.STL` | `ModuBOX_Stack_5H93_2x10.STL` | 109.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_3x1.STL` | `ModuBOX_Stack_5H93_3x1.STL` | 164.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_3x2.STL` | `ModuBOX_Stack_5H93_3x2.STL` | 164.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_3x3.STL` | `ModuBOX_Stack_5H93_3x3.STL` | 164.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_3x4.STL` | `ModuBOX_Stack_5H93_3x4.STL` | 164.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_3x5.STL` | `ModuBOX_Stack_5H93_3x5.STL` | 164.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_3x6.STL` | `ModuBOX_Stack_5H93_3x6.STL` | 164.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_3x7.STL` | `ModuBOX_Stack_5H93_3x7.STL` | 164.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_3x8.STL` | `ModuBOX_Stack_5H93_3x8.STL` | 164.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_3x9.STL` | `ModuBOX_Stack_5H93_3x9.STL` | 164.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_3x10.STL` | `ModuBOX_Stack_5H93_3x10.STL` | 164.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_4x1.STL` | `ModuBOX_Stack_5H93_4x1.STL` | 219.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_4x2.STL` | `ModuBOX_Stack_5H93_4x2.STL` | 219.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_4x3.STL` | `ModuBOX_Stack_5H93_4x3.STL` | 219.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_4x4.STL` | `ModuBOX_Stack_5H93_4x4.STL` | 219.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_4x5.STL` | `ModuBOX_Stack_5H93_4x5.STL` | 219.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_4x6.STL` | `ModuBOX_Stack_5H93_4x6.STL` | 219.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_4x7.STL` | `ModuBOX_Stack_5H93_4x7.STL` | 219.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_4x8.STL` | `ModuBOX_Stack_5H93_4x8.STL` | 219.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_4x9.STL` | `ModuBOX_Stack_5H93_4x9.STL` | 219.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_4x10.STL` | `ModuBOX_Stack_5H93_4x10.STL` | 219.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_5x1.STL` | `ModuBOX_Stack_5H93_5x1.STL` | 274.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_5x2.STL` | `ModuBOX_Stack_5H93_5x2.STL` | 274.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_5x3.STL` | `ModuBOX_Stack_5H93_5x3.STL` | 274.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_5x4.STL` | `ModuBOX_Stack_5H93_5x4.STL` | 274.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_5x5.STL` | `ModuBOX_Stack_5H93_5x5.STL` | 274.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_5x6.STL` | `ModuBOX_Stack_5H93_5x6.STL` | 274.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_5x7.STL` | `ModuBOX_Stack_5H93_5x7.STL` | 274.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_5x8.STL` | `ModuBOX_Stack_5H93_5x8.STL` | 274.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_5x9.STL` | `ModuBOX_Stack_5H93_5x9.STL` | 274.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_5x10.STL` | `ModuBOX_Stack_5H93_5x10.STL` | 274.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_6x1.STL` | `ModuBOX_Stack_5H93_6x1.STL` | 329.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_6x2.STL` | `ModuBOX_Stack_5H93_6x2.STL` | 329.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_6x3.STL` | `ModuBOX_Stack_5H93_6x3.STL` | 329.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_6x4.STL` | `ModuBOX_Stack_5H93_6x4.STL` | 329.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_6x5.STL` | `ModuBOX_Stack_5H93_6x5.STL` | 329.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_6x6.STL` | `ModuBOX_Stack_5H93_6x6.STL` | 329.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_6x7.STL` | `ModuBOX_Stack_5H93_6x7.STL` | 329.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_6x8.STL` | `ModuBOX_Stack_5H93_6x8.STL` | 329.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_6x9.STL` | `ModuBOX_Stack_5H93_6x9.STL` | 329.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_6x10.STL` | `ModuBOX_Stack_5H93_6x10.STL` | 329.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_7x1.STL` | `ModuBOX_Stack_5H93_7x1.STL` | 384.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_7x2.STL` | `ModuBOX_Stack_5H93_7x2.STL` | 384.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_7x3.STL` | `ModuBOX_Stack_5H93_7x3.STL` | 384.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_7x4.STL` | `ModuBOX_Stack_5H93_7x4.STL` | 384.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_7x5.STL` | `ModuBOX_Stack_5H93_7x5.STL` | 384.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_7x6.STL` | `ModuBOX_Stack_5H93_7x6.STL` | 384.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_7x7.STL` | `ModuBOX_Stack_5H93_7x7.STL` | 384.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_7x8.STL` | `ModuBOX_Stack_5H93_7x8.STL` | 384.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_7x9.STL` | `ModuBOX_Stack_5H93_7x9.STL` | 384.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_7x10.STL` | `ModuBOX_Stack_5H93_7x10.STL` | 384.8 x 549.8 x 93 |
+| `ModuBOX_Stack_6H93_8x1.STL` | `ModuBOX_Stack_5H93_8x1.STL` | 439.8 x 54.8 x 93 |
+| `ModuBOX_Stack_6H93_8x2.STL` | `ModuBOX_Stack_5H93_8x2.STL` | 439.8 x 109.8 x 93 |
+| `ModuBOX_Stack_6H93_8x3.STL` | `ModuBOX_Stack_5H93_8x3.STL` | 439.8 x 164.8 x 93 |
+| `ModuBOX_Stack_6H93_8x4.STL` | `ModuBOX_Stack_5H93_8x4.STL` | 439.8 x 219.8 x 93 |
+| `ModuBOX_Stack_6H93_8x5.STL` | `ModuBOX_Stack_5H93_8x5.STL` | 439.8 x 274.8 x 93 |
+| `ModuBOX_Stack_6H93_8x6.STL` | `ModuBOX_Stack_5H93_8x6.STL` | 439.8 x 329.8 x 93 |
+| `ModuBOX_Stack_6H93_8x7.STL` | `ModuBOX_Stack_5H93_8x7.STL` | 439.8 x 384.8 x 93 |
+| `ModuBOX_Stack_6H93_8x8.STL` | `ModuBOX_Stack_5H93_8x8.STL` | 439.8 x 439.8 x 93 |
+| `ModuBOX_Stack_6H93_8x9.STL` | `ModuBOX_Stack_5H93_8x9.STL` | 439.8 x 494.8 x 93 |
+| `ModuBOX_Stack_6H93_8x10.STL` | `ModuBOX_Stack_5H93_8x10.STL` | 439.8 x 549.8 x 93 |
+
+### `organizers/four cup 2x3/` (1)
+
+| Current | Should be | Measured (mm) |
+|---|---|---|
+| `ModuBOX - Four cup_Bottom 2x2.STL` | `ModuBOX - Four cup_Bottom 2x3.STL` | 164.5 x 62.2 x 109.5 |

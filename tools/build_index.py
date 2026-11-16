@@ -51,6 +51,13 @@ def parse(name, folder):
     m = RE_SIZE.search(stem)
     if m:
         a["w"], a["d"] = float(m.group(1)), float(m.group(2))
+    # Folder declares a footprint (e.g. "four cup 2x3") but the name says another one.
+    # In 2026-05-26, "four cup 2x3/...Bottom 2x2.STL" measures 164.5 mm wide: it is the 2x3 bottom.
+    mf = RE_SIZE.search(folder.split("/")[-1])
+    if mf and "w" in a and sorted((a["w"], a["d"])) != sorted((float(mf.group(1)), float(mf.group(2)))):
+        fw, fd = float(mf.group(1)), float(mf.group(2))
+        a["warn"] = f"Name says {a['w']:g}x{a['d']:g} but folder (and real size) is {fw:g}x{fd:g}"
+        a["w"], a["d"] = fw, fd
     if "w" in a and (a["w"] > 20 or a["d"] > 20):      # e.g. sandpaper 70x200 is mm, not grid units
         a["paper"] = f"{a.pop('w'):g}x{a.pop('d'):g}mm"
     m = RE_HEIGHT_RANGE.search(stem)
