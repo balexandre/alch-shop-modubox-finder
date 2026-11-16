@@ -26,6 +26,7 @@ The full per-file diff is in `changes/<version>.md`.
 - Favicon matching the header logo. The Changes tab and the file warnings link to the naming-issues list, and the .md links open on GitHub.
 - New **Plan a drawer** tab: enter the drawer size (and optionally height) and pick a printer, or add your own. It gives base grid tiles split to fit the bed, edge strips placed left/right/split and front/back/split, which box heights and stacks fit, and a printable file list (copy or CSV). Clicking a piece shows its file.
 - Plan a drawer: the layout now uses the full page width and up to 75% of the screen height. It was drawn at 1 px per mm because `viewBox` wasn't applied. Thin strips have a wider invisible click area, and the clicked piece shows under the drawing with Copy path and Show in Browse. Corners can be filled: the plan adds a 1-grid edge piece per side and says what lengths to cut in the slicer. The file list shows these notes, and Copy and CSV include them.
+- Printer presets: the H2D is now listed twice, single nozzle (325 × 320 mm) and both nozzles (300 × 320 mm), from Bambu's specs. The old "H2D (both nozzles)" entry had the single-nozzle size and moves to the single-nozzle option.
 - Footer invites contributions (fork, PR, issues). Added a PR template and issue forms.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.

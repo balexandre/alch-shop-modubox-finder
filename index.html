@@ -553,6 +553,7 @@ function app() {
     editRoot: false,
     plan: Object.assign({ W: '', D: '', H: '', clear: 1, topClear: 2, printer: 'Bambu Lab|A1', edgeX: 'split', edgeY: 'split', fillCorners: true },
       (() => { try { return JSON.parse(localStorage.getItem('plan') || '{}'); } catch { return {}; } })()),
+    // (renamed presets are migrated in init)
     customPrinters: (() => { try { return JSON.parse(localStorage.getItem('printers') || '[]'); } catch { return []; } })(),
     planPick: null,
     addPrinter: false, newPrinter: { name: '', x: '', y: '' },
@@ -571,6 +572,8 @@ function app() {
       this.version = this.versions[0].version;
       await this.loadVersion();
       this.$watch('q', () => { this.limit = 100; });
+      if (this.plan.printer === 'Bambu Lab|H2D (both nozzles)') this.plan.printer = 'Bambu Lab|H2D, single nozzle (one colour)';   // old, mislabelled preset
+      if (!this.bed()) this.plan.printer = 'Bambu Lab|A1';
       this.$watch('plan', v => { try { localStorage.setItem('plan', JSON.stringify(v)); } catch {} });
       this.$watch('tab', t => t === 'search' && this.$nextTick(() => this.$refs.q.focus()));
       this.initViewer();
