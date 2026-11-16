@@ -18,5 +18,7 @@ The full per-file diff is in `changes/<version>.md`.
 - Each PDF/PNG has a title, page count, description and tags (`data/docs.json`), and these are searchable.
 - The Stackable naming warning only shows for this release.
 - Links to Alexander's label generator (label.alch.shop): in the header, and as a card on each box that says which Box type and Width to pick. The generator has no URL parameters, so it can't be pre-filled.
+- Public site shows a one-time "this is an index, not a download" notice with an "I understand" button (hidden on localhost), and Browse explains that files aren't hosted.
+- The theme button is now the rightmost header control.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.
