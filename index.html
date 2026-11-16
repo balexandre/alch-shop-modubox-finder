@@ -216,17 +216,15 @@
         </template>
       </div>
       <div class="min-w-0">
-        <template x-if="guideFor(folder)">
-          <div class="rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-4 mb-4 text-sm">
-            <div class="flex items-center gap-2"><span class="font-semibold" x-text="guideFor(folder).title"></span>
-              <span x-show="guideFor(folder).draft" class="text-[10px] uppercase tracking-wide bg-amber-200 dark:bg-amber-800 rounded px-1.5">draft</span></div>
-            <p class="mt-1" x-text="guideFor(folder).summary"></p>
-            <ol class="list-decimal ml-5 mt-2 space-y-0.5" x-show="guideFor(folder).steps?.length">
-              <template x-for="s in guideFor(folder).steps"><li x-text="s"></li></template>
+                  <div x-show="guideFor(folder)" class="rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-4 mb-4 text-sm">
+            <div class="flex items-center gap-2"><span class="font-semibold" x-text="fguide.title"></span>
+              <span x-show="fguide.draft" class="text-[10px] uppercase tracking-wide bg-amber-200 dark:bg-amber-800 rounded px-1.5">draft</span></div>
+            <p class="mt-1" x-text="fguide.summary"></p>
+            <ol class="list-decimal ml-5 mt-2 space-y-0.5" x-show="fguide.steps?.length">
+              <template x-for="(s, i) in fguide.steps" :key="i"><li x-text="s"></li></template>
             </ol>
-            <p x-show="guideWarn(guideFor(folder))" class="mt-2 text-amber-700 dark:text-amber-400" x-text="'⚠ ' + guideWarn(guideFor(folder))"></p>
+            <p x-show="guideWarn(fguide)" class="mt-2 text-amber-700 dark:text-amber-400" x-text="'⚠ ' + guideWarn(fguide)"></p>
           </div>
-        </template>
         <div class="text-xs font-mono text-stone-500 mb-2 break-all" x-text="root + '/' + folder"></div>
         <ul class="divide-y divide-stone-200 dark:divide-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
           <template x-for="it in folderFiles().slice(0, 300)" :key="it.id">
@@ -267,34 +265,31 @@
           x-text="selected ? 'No preview for this part. Open the file in your slicer.' : 'Pick a file to see where it is'"></div>
         <div x-show="selected && selected.a.shape" class="absolute bottom-2 left-3 text-[10px] text-stone-500">Approximate shape from the file name · drag to rotate</div>
       </div>
-      <template x-if="selected">
-        <div class="p-4 space-y-3 text-sm">
+      <div x-show="selected" class="p-4 space-y-3 text-sm">
           <div>
-            <div class="font-semibold break-all" x-text="selected.name"></div>
+            <div class="font-semibold break-all" x-text="sel.name"></div>
             <div class="text-stone-500 text-xs mt-0.5" x-show="dims()" x-text="dims()"></div>
           </div>
-          <div x-show="selected.a.warn" class="rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 px-3 py-2 text-xs" x-text="'⚠ In this release (' + version + '): ' + selected.a.warn + '. A later release may fix the name.'"></div>
-          <template x-if="docFor(selected)">
-            <div class="rounded-md border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-3 py-2">
-              <div class="text-xs font-semibold" x-text="docFor(selected).title"></div>
-              <p class="text-xs mt-0.5 leading-relaxed" x-text="docFor(selected).description"></p>
+          <div x-show="sel.a.warn" class="rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 px-3 py-2 text-xs" x-text="'⚠ In this release (' + version + '): ' + sel.a.warn + '. A later release may fix the name.'"></div>
+          <div x-show="docFor(selected)" class="rounded-md border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-3 py-2">
+              <div class="text-xs font-semibold" x-text="doc.title"></div>
+              <p class="text-xs mt-0.5 leading-relaxed" x-text="doc.description"></p>
               <div class="flex flex-wrap gap-1 mt-1.5">
-                <span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="docFor(selected).pages + (docFor(selected).pages === 1 ? ' page' : ' pages')"></span>
-                <template x-for="t in docFor(selected).tags" :key="t"><span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="t"></span></template>
+                <span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="doc.pages + (doc.pages === 1 ? ' page' : ' pages')"></span>
+                <template x-for="t in doc.tags" :key="t"><span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="t"></span></template>
               </div>
             </div>
-          </template>
           <div>
             <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">Where to find it</div>
             <div class="font-mono text-xs bg-stone-100 dark:bg-stone-800 rounded-md p-2 break-all">
               <template x-for="(seg, i) in crumbs()" :key="i">
                 <span><button class="hover:text-amber-600 hover:underline" @click="goFolder(seg.path)" x-text="seg.name"></button><span class="text-stone-400"> / </span></span>
               </template>
-              <span class="font-semibold" x-text="selected.name"></span>
+              <span class="font-semibold" x-text="sel.name"></span>
             </div>
             <div class="flex gap-2 mt-2">
               <button @click="copy(fullPath())" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'path' ? 'Copied ✓' : 'Copy path'"></button>
-              <button @click="copy(selected.name, 'name')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'name' ? 'Copied ✓' : 'Copy file name'"></button>
+              <button @click="copy(sel.name, 'name')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'name' ? 'Copied ✓' : 'Copy file name'"></button>
               <button @click="copy(location.href, 'link')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'link' ? 'Copied ✓' : 'Share link'"></button>
             </div>
             <div class="mt-2 text-[11px] text-stone-500">
@@ -321,24 +316,19 @@
               </template>
             </div>
           </div>
-          <template x-if="labelHint()">
-            <div class="rounded-md border border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 px-3 py-2">
+          <div x-show="labelHint()" class="rounded-md border border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 px-3 py-2">
               <div class="flex items-center justify-between gap-2">
                 <div class="text-xs font-semibold">Make a label for this box</div>
                 <a href="https://label.alch.shop" target="_blank" rel="noopener" class="text-xs px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-700 text-white shrink-0">Open generator ↗</a>
               </div>
-              <p class="text-xs mt-1 leading-relaxed">In Alexander's label generator, set <b>Box type</b> to <b x-text="labelHint().type"></b> and <b>Width</b> to <b x-text="labelHint().width"></b>.</p>
-              <p x-show="labelHint().note" class="text-[11px] mt-1 text-stone-500" x-text="labelHint().note"></p>
+              <p class="text-xs mt-1 leading-relaxed">In Alexander's label generator, set <b>Box type</b> to <b x-text="lh.type"></b> and <b>Width</b> to <b x-text="lh.width"></b>.</p>
+              <p x-show="lh.note" class="text-[11px] mt-1 text-stone-500" x-text="lh.note"></p>
             </div>
-          </template>
-          <template x-if="guideFor(selected.folder)">
-            <div class="border-t border-stone-200 dark:border-stone-800 pt-3">
-              <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">How to use · <span x-text="guideFor(selected.folder).title"></span></div>
-              <p class="text-xs leading-relaxed" x-text="guideFor(selected.folder).summary"></p>
+          <div x-show="guideFor(sel.folder)" class="border-t border-stone-200 dark:border-stone-800 pt-3">
+              <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">How to use · <span x-text="sguide.title"></span></div>
+              <p class="text-xs leading-relaxed" x-text="sguide.summary"></p>
             </div>
-          </template>
         </div>
-      </template>
     </div>
     <p class="text-[11px] text-stone-500 mt-3 leading-relaxed">Unofficial index with file locations only. The ModuBOX design and files are © Alexander Chapel. Get them at <a class="underline" href="https://www.alch.shop/" target="_blank" rel="noopener">alch.shop</a>.</p>
   </aside>
@@ -348,6 +338,9 @@
 const GRID = 55;
 const heightMm = h => 21 + 18 * (h - 1);
 const BOX = '01_Boxes and grids/ModuBOXES/';
+const EMPTY_ITEM = Object.freeze({ name: '', folder: '', kind: '', size: 0, a: {} });
+const EMPTY_DOC = { title: '', description: '', pages: 0, tags: [] };
+const EMPTY_GUIDE = { title: '', summary: '', steps: [], draft: false };
 const MEMO = {}; let TREE = null, TREE_FOR = null, VIEW = null; // kept outside Alpine's reactive state
 
 function app() {
@@ -414,7 +407,7 @@ function app() {
       this.$watch('tab', t => t === 'search' && this.$nextTick(() => this.$refs.q.focus()));
       this.initViewer();
       const h = new URLSearchParams(location.hash.slice(1));
-      if (h.get('f') && this.byPath[h.get('f')]) { this.select(this.byPath[h.get('f')]); this.tab = 'browse'; }
+      if (h.get('f') && this.byPath[h.get('f')]) { const it = this.byPath[h.get('f')]; this.goFolder(it.folder); this.select(it); }
       if (h.get('q')) { this.q = h.get('q'); this.tab = 'search'; }
     },
     async loadVersion() {
@@ -468,7 +461,7 @@ function app() {
 
     // ---- search ----
     memo(slot, key, fn) {
-      const k = JSON.stringify(key);
+      const k = JSON.stringify([this.items.length, ...key]);   // items.length: never serve results cached before the index loaded
       if (MEMO[slot]?.k !== k) MEMO[slot] = { k, v: fn() };
       return MEMO[slot].v;
     },
@@ -497,7 +490,8 @@ function app() {
 
     // ---- browse ----
     tree() {
-      if (TREE_FOR === this.version) return TREE;
+      if (!this.folders.length) return [];          // index not loaded yet
+      if (TREE && TREE_FOR === this.version) return TREE;
       const nodes = {};
       for (const f of this.folders) {
         if (!f.p) continue;
@@ -543,6 +537,12 @@ function app() {
           : 'This box is a half-grid width. If the generator does not offer it, pick the closest width it does.',
       };
     },
+    // Safe stand-ins so the always-rendered detail panel never reads from null.
+    get sel() { return this.selected || EMPTY_ITEM; },
+    get doc() { return this.docFor(this.selected) || EMPTY_DOC; },
+    get lh() { return this.labelHint() || { type: '', width: '', note: '' }; },
+    get fguide() { return this.guideFor(this.folder) || EMPTY_GUIDE; },
+    get sguide() { return this.guideFor(this.sel.folder) || EMPTY_GUIDE; },
     docFor(it) { return it ? this.docs[it.folder + '/' + it.name] : null; },
     guideFor(p) {
       if (p == null) return null;
@@ -559,6 +559,7 @@ function app() {
       this.drawPreview(it.a);
     },
     crumbs() {
+      if (!this.selected) return [];
       const parts = [this.root, ...this.selected.folder.split('/')];
       return parts.map((n, i) => ({ name: n, path: parts.slice(1, i + 1).join('/') }));
     },
@@ -570,6 +571,7 @@ function app() {
       return r.replace(/[\\/]+$/, '') + (win ? '\\' + rel.replace(/\//g, '\\') : '/' + rel);
     },
     dims() {
+      if (!this.selected) return '';
       const a = this.selected.a;
       if (a.w == null) return '';
       let s = `${a.w} × ${a.d} grid ≈ ${Math.round(a.w * GRID)} × ${Math.round(a.d * GRID)} mm`;
@@ -577,6 +579,7 @@ function app() {
       return s;
     },
     attrList() {
+      if (!this.selected) return [];
       const a = this.selected.a, L = [];
       L.push(['Type', this.selected.kind.toUpperCase()]);
       L.push(['Size on disk', this.fmtSize(this.selected.size)]);

@@ -51,4 +51,10 @@ The 3D preview in the detail panel is a box generated from the file name, not th
 4. Add a section to `CHANGELOG.md` covering index changes (from step 3) and site changes.
 5. Add new PDFs to `data/docs.json` (title and short description only). Check whether the name quirks were fixed, and version-key any new warnings.
 6. Update `data/guides.json` for new or renamed folders, and update the parsing rules in `build_index.py` for new naming patterns.
-7. Test locally with `python3 -m http.server`, then open http://localhost:8000.
+7. Test locally with `python3 -m http.server 8765`, then run `node tools/check_site.mjs` (headless Chromium smoke test; it must print NO ERRORS) and look at its screenshots.
+
+## Alpine gotchas (learned the hard way)
+- Computed helpers run before the index has loaded. Return empty values then, never `null`.
+- `memo()` keys include `items.length`, so results computed before the data arrived are never reused.
+- Don't wrap the detail panel in `x-if`: a fast null→item switch broke Alpine's `x-for` cleanup. Use `x-show` with the safe getters (`sel`, `doc`, `lh`, `fguide`, `sguide`).
+- Keep big data frozen (`Object.freeze`) and keep caches and three.js objects outside the Alpine object.
