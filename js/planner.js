@@ -43,7 +43,7 @@ function sideGaps(total, mode) {           // mode: 'start' | 'end' | 'split'
   return [a >= 1 ? a : 0, b >= 1 ? b : 0];
 }
 
-function planDrawer({ W, D, H = 0, clear = 1, topClear = 2, bedX, bedY, edgeX = 'split', edgeY = 'split' }) {
+function planDrawer({ W, D, H = 0, clear = 1, topClear = 2, bedX, bedY, edgeX = 'split', edgeY = 'split', fillCorners = true }) {
   const G = PLAN.GRID;
   W = +W; D = +D; H = +H || 0; clear = +clear || 0; topClear = +topClear || 0; bedX = +bedX; bedY = +bedY;
   if (!(W > 0 && D > 0)) return { error: 'Enter the inside width and depth of your drawer.' };
@@ -84,8 +84,17 @@ function planDrawer({ W, D, H = 0, clear = 1, topClear = 2, bedX, bedY, edgeX = 
   strip('right', ny, right, false, x0 + nx * G, y0);
   strip('back', nx, back, true, 0, x0);
   strip('front', nx, front, true, y0 + ny * G, x0);
-  const corners = [];
-  for (const [cx, cw] of [[0, left], [x0 + nx * G, right]]) for (const [cy, cd] of [[0, back], [y0 + ny * G, front]]) if (cw && cd) corners.push({ x: cx, y: cy, w: cw, d: cd });
+  // Corners where a side strip meets a back/front strip. No file is that small, so we cut them from
+  // Edgegrid_1 Grid + <side gap>mm (55 mm long): one piece can give both corners on a side if they fit.
+  const corners = [], fillers = [], KERF = 1;
+  for (const [side, cx, cw] of [['left', 0, left], ['right', x0 + nx * G, right]]) {
+    const mine = [];
+    for (const [cy, cd] of [[0, back], [y0 + ny * G, front]]) if (cw && cd) { const c = { side, x: cx, y: cy, w: cw, d: cd, filled: !!fillCorners }; corners.push(c); mine.push(c); }
+    if (!fillCorners || !mine.length) continue;
+    const pieces = [];                                 // first-fit packing of corner lengths into 55 mm pieces
+    for (const c of mine) { const pc = pieces.find(p => p.used + KERF + c.d <= G); if (pc) { pc.cuts.push(c.d); pc.used += KERF + c.d; } else pieces.push({ cuts: [c.d], used: c.d }); }
+    for (const pc of pieces) fillers.push({ side, gap: cw, cuts: pc.cuts, path: edgeFile(1, cw) });
+  }
 
   // Heights: conservative, it assumes boxes don't nest into the grid or into each other.
   let heights = null;
@@ -97,10 +106,13 @@ function planDrawer({ W, D, H = 0, clear = 1, topClear = 2, bedX, bedY, edgeX = 
 
   const count = {};
   for (const p of [...tiles, ...edges]) count[p.path] = (count[p.path] || 0) + 1;
-  const list = Object.entries(count).map(([path, qty]) => ({ path, qty })).sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }));
+  const list = Object.entries(count).map(([path, qty]) => ({ path, qty, note: '' })).sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }));
+  const fcount = {};
+  for (const f of fillers) { const note = `corner filler: cut into ${f.cuts.map(c => c + ' mm').join(' + ')} long pieces`; const k = f.path + '|' + note; (fcount[k] ??= { path: f.path, qty: 0, note }).qty++; }
+  list.push(...Object.values(fcount));
 
   return { W, D, nx, ny, gridW: nx * G, gridD: ny * G, gaps: { left, right, back, front }, slackX: +(W - clear - nx * G - left - right).toFixed(1),
-    slackY: +(D - clear - ny * G - back - front).toFixed(1), tiles, edges, corners, heights, list, cellsPerTile: [Lbig, Lsmall] };
+    slackY: +(D - clear - ny * G - back - front).toFixed(1), tiles, edges, corners, fillers, heights, list, cellsPerTile: [Lbig, Lsmall] };
 }
 
 if (typeof module !== 'undefined') module.exports = { planDrawer, splitCells, PRINTERS, PLAN };
