@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ModuBOX Finder</title>
+<meta name="description" content="Unofficial, searchable index of the ModuBOX Master set by Alexander Chapel (alch.shop). It contains file locations only. Buy the files at alch.shop.">
+<script src="https://cdn.tailwindcss.com/3.4.5"></script>
+<script>
+  // Theme: 'system' | 'light' | 'dark', remembered in localStorage. Applied before first paint.
+  function applyTheme(t) {
+    const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', dark);
+  }
+  function savedTheme() { try { return localStorage.getItem('theme') || 'system'; } catch { return 'system'; } }
+  applyTheme(savedTheme());
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme(savedTheme()));
+</script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] } } } }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  [x-cloak] { display: none !important; }
+  body { background: #fafaf9; }
+  html.dark body { background: #0c0a09; }
+  .cell { aspect-ratio: 1; }
+</style>
+</head>
+<body class="font-sans text-stone-800 dark:text-stone-200 antialiased" x-data="app()" x-init="init()">
+
+<!-- Header -->
+<header class="sticky top-0 z-20 border-b border-stone-200 dark:border-stone-800 bg-white/90 dark:bg-stone-950/90 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="w-7 h-7 rounded-md bg-amber-500 grid grid-cols-2 gap-0.5 p-1">
+        <span class="bg-white/90 rounded-sm"></span><span class="bg-white/60 rounded-sm"></span>
+        <span class="bg-white/60 rounded-sm"></span><span class="bg-white/90 rounded-sm"></span>
+      </div>
+      <span class="font-semibold tracking-tight">ModuBOX Finder</span>
+    </div>
+    <nav class="hidden sm:flex gap-1 ml-4 text-sm">
+      <template x-for="t in tabs" :key="t.id">
+        <button @click="tab = t.id" class="px-3 py-1.5 rounded-md"
+          :class="tab === t.id ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900' : 'hover:bg-stone-100 dark:hover:bg-stone-800'" x-text="t.label"></button>
+      </template>
+    </nav>
+    <div class="ml-auto flex items-center gap-2 text-sm">
+      <select x-model="version" @change="loadVersion()" class="rounded-md border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1">
+        <template x-for="v in versions" :key="v.version"><option :value="v.version" x-text="v.label"></option></template>
+      </select>
+      <button @click="cycleTheme()" class="w-9 h-9 grid place-items-center rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500"
+        :title="'Theme: ' + theme + ' (click to change)'" :aria-label="'Theme: ' + theme">
+        <svg x-show="theme === 'system'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        <svg x-show="theme === 'light'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg x-show="theme === 'dark'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a href="https://label.alch.shop" target="_blank" rel="noopener" class="hidden md:inline-flex px-3 py-1.5 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500">Label generator ↗</a>
+      <a href="https://www.alch.shop/" target="_blank" rel="noopener" class="hidden md:inline-flex px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-600 text-white font-medium">Buy the files ↗</a>
+    </div>
+  </div>
+  <nav class="sm:hidden flex gap-1 px-4 pb-2 text-sm">
+    <template x-for="t in tabs" :key="t.id">
+      <button @click="tab = t.id" class="flex-1 px-3 py-1.5 rounded-md"
+        :class="tab === t.id ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900' : 'bg-stone-100 dark:bg-stone-800'" x-text="t.label"></button>
+    </template>
+  </nav>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 py-6" x-show="!ready">Loading index…</div>
+
+<main class="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[1fr_380px] gap-6" x-cloak x-show="ready">
+  <section class="min-w-0">
+
+    <!-- ===== FIND A BOX ===== -->
+    <div x-show="tab === 'find'">
+      <h1 class="text-2xl font-semibold tracking-tight">Find the right box file</h1>
+      <p class="text-stone-500 mt-1 text-sm">Pick a style and height, then click a footprint. The grid shows every size that exists in this release.</p>
+
+      <div class="mt-5 space-y-4">
+        <div>
+          <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1.5">1 · Style</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            <template x-for="s in styles" :key="s.id">
+              <button @click="pickStyle(s)" class="group rounded-xl border p-2 text-left transition"
+                :class="finder.style === s.id ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50 dark:bg-amber-950/30' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-amber-400'">
+                <img :src="'img/styles/' + s.id + '.png'" :alt="s.label" loading="lazy" class="w-full aspect-[4/3] object-contain">
+                <div class="text-sm font-medium mt-1" x-text="s.label"></div>
+                <div class="text-[11px] text-stone-500 leading-snug" x-text="s.short"></div>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Style explainer -->
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 grid sm:grid-cols-[220px_1fr] gap-4">
+          <div>
+            <img :src="'img/styles/' + currentStyle().id + (finder.view === 'top' ? '' : '-' + finder.view) + '.png'" :alt="currentStyle().label + ' ' + finder.view"
+              class="w-full aspect-[4/3] object-contain rounded-lg bg-stone-50 dark:bg-stone-800/60">
+            <div class="flex gap-1 mt-2 text-xs">
+              <template x-for="v in [['top','Top'],['under','Underside'],['section','Cut-away']]" :key="v[0]">
+                <button @click="finder.view = v[0]" class="flex-1 py-1 rounded-md border"
+                  :class="finder.view === v[0] ? 'bg-stone-900 text-white border-stone-900 dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'" x-text="v[1]"></button>
+              </template>
+            </div>
+          </div>
+          <div class="text-sm">
+            <div class="font-semibold" x-text="currentStyle().label"></div>
+            <p class="mt-1 leading-relaxed" x-text="currentStyle().desc"></p>
+            <p class="mt-2 text-xs text-stone-500">Folder: <span class="font-mono" x-text="currentStyle().prefix"></span></p>
+            <p class="mt-1 text-xs text-stone-500" x-text="'Picture: ' + currentStyle().sample"></p>
+          </div>
+        </div>
+        <div x-show="currentStyle().heights">
+          <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1.5">2 · Height</div>
+          <div class="flex flex-wrap gap-1.5">
+            <template x-for="h in [1,2,3,4,5,6]" :key="h">
+              <button @click="finder.h = h; finder.pick = null" :disabled="!finderHeights().includes(h)"
+                class="w-20 py-1.5 rounded-md text-sm border disabled:opacity-30 disabled:cursor-not-allowed"
+                :class="finder.h === h ? 'bg-stone-900 border-stone-900 text-white dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'">
+                <span x-text="h + 'H'"></span> <span class="text-xs opacity-60" x-text="heightMm(h) + 'mm'"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Size matrix -->
+        <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 overflow-x-auto">
+          <div class="flex items-baseline justify-between mb-3">
+            <div class="text-sm font-medium"><span x-text="currentStyle().heights ? '3 · ' : '2 · '"></span><span x-text="currentStyle().axisLabel || 'Footprint'"></span>
+              <span class="text-stone-500 font-normal" x-text="currentStyle().axisHint || '(width × depth, in 55 mm grid units)'"></span></div>
+            <div class="text-xs text-stone-500" x-text="matrix().count + ' files'"></div>
+          </div>
+          <div class="inline-grid gap-1" :style="`grid-template-columns: 2.5rem repeat(${matrix().ds.length}, minmax(1.9rem,1fr))`">
+            <div class="text-[10px] text-stone-400 flex items-end justify-center" x-text="currentStyle().corner || 'W\\D'"></div>
+            <template x-for="d in matrix().ds" :key="'h'+d"><div class="text-[10px] text-stone-500 text-center" x-text="d"></div></template>
+            <template x-for="w in matrix().ws" :key="'r'+w">
+              <div class="contents">
+                <div class="text-[10px] text-stone-500 flex items-center justify-end pr-1" x-text="w"></div>
+                <template x-for="d in matrix().ds" :key="w+'x'+d">
+                  <button class="cell rounded text-[9px] leading-none"
+                    :disabled="!matrix().map[w+'x'+d]"
+                    @click="select(matrix().map[w+'x'+d])"
+                    :title="matrix().map[w+'x'+d] ? matrix().map[w+'x'+d].name : ''"
+                    :class="!matrix().map[w+'x'+d] ? 'bg-stone-100 dark:bg-stone-800/50' : (selected && selected === matrix().map[w+'x'+d] ? 'bg-amber-500 text-white ring-2 ring-amber-300' : 'bg-amber-100 hover:bg-amber-300 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200 dark:hover:bg-amber-700')"></button>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SEARCH ===== -->
+    <div x-show="tab === 'search'">
+      <div class="relative">
+        <input x-ref="q" x-model.debounce.120ms="q" type="search" placeholder='Try "stack 2x3 4h", "mt3 ø55", "edgegrid 5 grid 25mm", "wood case 9mm", "pdf"'
+          class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 pl-11 pr-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-500">
+        <svg class="w-5 h-5 absolute left-4 top-3.5 text-stone-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <div class="flex flex-wrap gap-1.5 mt-3 text-xs">
+        <template x-for="c in categories" :key="c">
+          <button @click="cat = (cat === c ? '' : c)" class="px-2.5 py-1 rounded-full border"
+            :class="cat === c ? 'bg-stone-900 text-white border-stone-900 dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'" x-text="c"></button>
+        </template>
+        <span class="mx-1 border-l border-stone-300 dark:border-stone-700"></span>
+        <template x-for="k in ['stl','3mf','pdf','image']" :key="k">
+          <button @click="kind = (kind === k ? '' : k)" class="px-2.5 py-1 rounded-full border uppercase"
+            :class="kind === k ? 'bg-amber-500 text-white border-amber-500' : 'border-stone-300 dark:border-stone-700'" x-text="k"></button>
+        </template>
+      </div>
+      <div class="text-xs text-stone-500 mt-3" x-text="results().length.toLocaleString() + ' matches'"></div>
+      <ul class="mt-2 divide-y divide-stone-200 dark:divide-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+        <template x-for="it in results().slice(0, limit)" :key="it.id">
+          <li><button @click="select(it)" class="w-full text-left px-4 py-2.5 hover:bg-stone-50 dark:hover:bg-stone-800/60 flex items-center gap-3"
+              :class="selected === it && 'bg-amber-50 dark:bg-amber-900/20'">
+            <span class="text-[10px] font-mono uppercase w-9 shrink-0 text-center rounded px-1 py-0.5" :class="kindColor(it.kind)" x-text="it.kind"></span>
+            <span class="min-w-0">
+              <span class="block truncate text-sm font-medium" x-text="it.name"></span>
+              <span class="block truncate text-xs text-stone-500" x-text="docFor(it) ? docFor(it).title + ' · ' + it.folder : it.folder"></span>
+            </span>
+            <span x-show="it.a.warn" class="ml-auto text-amber-600" title="Name mismatch">⚠</span>
+          </button></li>
+        </template>
+      </ul>
+      <button x-show="results().length > limit" @click="limit += 100" class="mt-3 text-sm text-amber-600 hover:underline">Show more</button>
+    </div>
+
+    <!-- ===== BROWSE ===== -->
+    <div x-show="tab === 'browse'" class="grid md:grid-cols-[280px_1fr] gap-4">
+      <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-2 text-sm max-h-[75vh] overflow-auto">
+        <template x-for="r in treeRows()" :key="r.path">
+          <button @click="toggle(r)" class="w-full text-left flex items-center gap-1 py-1 pr-2 rounded hover:bg-stone-100 dark:hover:bg-stone-800"
+            :class="folder === r.path && 'bg-amber-100 dark:bg-amber-900/30'" :style="`padding-left:${r.depth * 14 + 6}px`">
+            <span class="w-3 text-stone-400 text-xs" x-text="r.hasKids ? (open[r.path] ? '▾' : '▸') : ''"></span>
+            <span class="truncate" x-text="r.name"></span>
+            <span class="ml-auto text-xs text-stone-400" x-text="r.total"></span>
+          </button>
+        </template>
+      </div>
+      <div class="min-w-0">
+        <template x-if="guideFor(folder)">
+          <div class="rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-4 mb-4 text-sm">
+            <div class="flex items-center gap-2"><span class="font-semibold" x-text="guideFor(folder).title"></span>
+              <span x-show="guideFor(folder).draft" class="text-[10px] uppercase tracking-wide bg-amber-200 dark:bg-amber-800 rounded px-1.5">draft</span></div>
+            <p class="mt-1" x-text="guideFor(folder).summary"></p>
+            <ol class="list-decimal ml-5 mt-2 space-y-0.5" x-show="guideFor(folder).steps?.length">
+              <template x-for="s in guideFor(folder).steps"><li x-text="s"></li></template>
+            </ol>
+            <p x-show="guideWarn(guideFor(folder))" class="mt-2 text-amber-700 dark:text-amber-400" x-text="'⚠ ' + guideWarn(guideFor(folder))"></p>
+          </div>
+        </template>
+        <div class="text-xs font-mono text-stone-500 mb-2 break-all" x-text="root + '/' + folder"></div>
+        <ul class="divide-y divide-stone-200 dark:divide-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+          <template x-for="it in folderFiles().slice(0, 300)" :key="it.id">
+            <li><button @click="select(it)" class="w-full text-left px-4 py-2 hover:bg-stone-50 dark:hover:bg-stone-800/60 flex items-center gap-3 text-sm"
+              :class="selected === it && 'bg-amber-50 dark:bg-amber-900/20'">
+              <span class="text-[10px] font-mono uppercase w-9 shrink-0 text-center rounded px-1 py-0.5" :class="kindColor(it.kind)" x-text="it.kind"></span>
+              <span class="min-w-0"><span class="block truncate" x-text="it.name"></span>
+                <span x-show="docFor(it)" class="block truncate text-xs text-stone-500" x-text="docFor(it)?.title"></span></span>
+              <span class="ml-auto text-xs text-stone-400 shrink-0" x-text="fmtSize(it.size)"></span>
+            </button></li>
+          </template>
+          <li x-show="!folderFiles().length" class="px-4 py-6 text-sm text-stone-500">This folder has only subfolders. Pick one on the left.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===== CHANGES ===== -->
+    <div x-show="tab === 'changes'" class="prose-sm max-w-none">
+      <h1 class="text-2xl font-semibold tracking-tight">Release history</h1>
+      <ul class="mt-4 space-y-2">
+        <template x-for="v in versions" :key="v.version">
+          <li class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+            <div class="font-medium" x-text="v.label + ' (' + v.version + ')'"></div>
+            <div class="text-sm text-stone-500" x-text="v.files.toLocaleString() + ' files'"></div>
+            <a class="text-sm text-amber-600 hover:underline" :href="'changes/' + v.version + '.md'">What changed ↗</a>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== DETAIL PANEL ===== -->
+  <aside class="lg:sticky lg:top-20 self-start">
+    <div class="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+      <div class="relative bg-gradient-to-b from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900 h-56">
+        <canvas x-ref="cv" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+        <div x-show="!selected || !selected.a.shape" class="absolute inset-0 flex items-center justify-center text-sm text-stone-500 text-center px-6"
+          x-text="selected ? 'No preview for this part. Open the file in your slicer.' : 'Pick a file to see where it is'"></div>
+        <div x-show="selected && selected.a.shape" class="absolute bottom-2 left-3 text-[10px] text-stone-500">Approximate shape from the file name · drag to rotate</div>
+      </div>
+      <template x-if="selected">
+        <div class="p-4 space-y-3 text-sm">
+          <div>
+            <div class="font-semibold break-all" x-text="selected.name"></div>
+            <div class="text-stone-500 text-xs mt-0.5" x-show="dims()" x-text="dims()"></div>
+          </div>
+          <div x-show="selected.a.warn" class="rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 px-3 py-2 text-xs" x-text="'⚠ In this release (' + version + '): ' + selected.a.warn + '. A later release may fix the name.'"></div>
+          <template x-if="docFor(selected)">
+            <div class="rounded-md border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-3 py-2">
+              <div class="text-xs font-semibold" x-text="docFor(selected).title"></div>
+              <p class="text-xs mt-0.5 leading-relaxed" x-text="docFor(selected).description"></p>
+              <div class="flex flex-wrap gap-1 mt-1.5">
+                <span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="docFor(selected).pages + (docFor(selected).pages === 1 ? ' page' : ' pages')"></span>
+                <template x-for="t in docFor(selected).tags" :key="t"><span class="text-[10px] rounded bg-white/70 dark:bg-stone-800 px-1.5" x-text="t"></span></template>
+              </div>
+            </div>
+          </template>
+          <div>
+            <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">Where to find it</div>
+            <div class="font-mono text-xs bg-stone-100 dark:bg-stone-800 rounded-md p-2 break-all">
+              <template x-for="(seg, i) in crumbs()" :key="i">
+                <span><button class="hover:text-amber-600 hover:underline" @click="goFolder(seg.path)" x-text="seg.name"></button><span class="text-stone-400"> / </span></span>
+              </template>
+              <span class="font-semibold" x-text="selected.name"></span>
+            </div>
+            <div class="flex gap-2 mt-2">
+              <button @click="copy(fullPath())" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'path' ? 'Copied ✓' : 'Copy path'"></button>
+              <button @click="copy(selected.name, 'name')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'name' ? 'Copied ✓' : 'Copy file name'"></button>
+              <button @click="copy(location.href, 'link')" class="text-xs px-2.5 py-1 rounded-md border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="copied === 'link' ? 'Copied ✓' : 'Share link'"></button>
+            </div>
+            <div class="mt-2 text-[11px] text-stone-500">
+              <button x-show="!editRoot" @click="editRoot = true" class="hover:text-amber-600 underline decoration-dotted"
+                x-text="localRoot ? 'Copying from: ' + localRoot : 'Set where your Master set is, to copy full paths'"></button>
+              <form x-show="editRoot" @submit.prevent="saveRoot()" class="flex gap-1">
+                <input x-model="localRoot" placeholder="C:\Users\you\Downloads\01_ModuBOX - Master set"
+                  class="flex-1 min-w-0 rounded border border-stone-300 dark:border-stone-700 bg-transparent px-2 py-1 font-mono text-[11px]">
+                <button class="px-2 rounded bg-amber-500 text-white">Save</button>
+              </form>
+            </div>
+          </div>
+          <div x-show="attrList().length">
+            <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">Details</div>
+            <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
+              <template x-for="[k, v] in attrList()" :key="k"><div class="contents"><dt class="text-stone-500" x-text="k"></dt><dd x-text="v"></dd></div></template>
+            </dl>
+          </div>
+          <div x-show="otherHeights().length">
+            <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">Same footprint, other heights</div>
+            <div class="flex flex-wrap gap-1">
+              <template x-for="o in otherHeights()" :key="o.id">
+                <button @click="select(o)" class="text-xs px-2 py-0.5 rounded border border-stone-300 dark:border-stone-700 hover:border-amber-500" x-text="o.a.h + 'H'"></button>
+              </template>
+            </div>
+          </div>
+          <template x-if="labelHint()">
+            <div class="rounded-md border border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 px-3 py-2">
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-xs font-semibold">Make a label for this box</div>
+                <a href="https://label.alch.shop" target="_blank" rel="noopener" class="text-xs px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-700 text-white shrink-0">Open generator ↗</a>
+              </div>
+              <p class="text-xs mt-1 leading-relaxed">In Alexander's label generator, set <b>Box type</b> to <b x-text="labelHint().type"></b> and <b>Width</b> to <b x-text="labelHint().width"></b>.</p>
+              <p x-show="labelHint().note" class="text-[11px] mt-1 text-stone-500" x-text="labelHint().note"></p>
+            </div>
+          </template>
+          <template x-if="guideFor(selected.folder)">
+            <div class="border-t border-stone-200 dark:border-stone-800 pt-3">
+              <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1">How to use · <span x-text="guideFor(selected.folder).title"></span></div>
+              <p class="text-xs leading-relaxed" x-text="guideFor(selected.folder).summary"></p>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+    <p class="text-[11px] text-stone-500 mt-3 leading-relaxed">Unofficial index with file locations only. The ModuBOX design and files are © Alexander Chapel. Get them at <a class="underline" href="https://www.alch.shop/" target="_blank" rel="noopener">alch.shop</a>.</p>
+  </aside>
+</main>
+
+<script>
+const GRID = 55;
+const heightMm = h => 21 + 18 * (h - 1);
+const BOX = '01_Boxes and grids/ModuBOXES/';
+const MEMO = {}; let TREE = null, TREE_FOR = null, VIEW = null; // kept outside Alpine's reactive state
+
+function app() {
+  return {
+    tabs: [{ id: 'find', label: 'Find a box' }, { id: 'search', label: 'Search' }, { id: 'browse', label: 'Browse' }, { id: 'changes', label: 'Changes' }],
+    tab: 'find', ready: false, versions: [], version: null, root: '01_ModuBOX - Master set',
+    items: [], folders: [], guides: {}, byPath: {},
+    q: '', cat: '', kind: '', limit: 100,
+    folder: '01_Boxes and grids', open: { '01_Boxes and grids': true },
+    selected: null, copied: '',
+    // Pictures in img/styles/<id>{,-under,-section}.png are rendered by tools/render_thumbs.mjs
+    styles: [
+      { id: 'regular', label: 'Regular', prefix: BOX + 'Regular/', heights: true, sample: '2H, 2×2',
+        short: 'Open box, whole grid sizes',
+        desc: 'The standard open box. It has grid feet underneath that lock into the base grid, and it comes in whole 55 mm grid steps from 1×1 up to 8×12.' },
+      { id: 'half', label: 'HalfGrid', prefix: BOX + 'HalfGrid/', heights: true, sample: '2H, 1×1.5',
+        short: 'Open box, 27.5 mm steps',
+        desc: 'Like Regular, but sized in half-grid steps (27.5 mm). Use it for narrow parts or to fill the odd gap next to bigger boxes.' },
+      { id: 'stack', label: 'Stackable', prefix: BOX + 'Stackable/', heights: true, sample: '2H, 2×2',
+        short: 'Lip on top for stacking',
+        desc: 'Like Regular, but with a chamfered inner lip along the top edge, so another box sits on top and stays put. The cut-away view shows the lip best.' },
+      { id: 'stackhalf', label: 'Stackable HalfGrid', prefix: BOX + 'Stackable_Halfgrid/', heights: true, sample: '2H, 1×1.5',
+        short: 'Stacking lip, half-grid sizes',
+        desc: 'The Stackable lip combined with half-grid (27.5 mm) sizes.' },
+      { id: 'split', label: 'Split', prefix: BOX + 'Split/', heights: true, sample: '4H, 2×2',
+        short: 'Tall boxes for the Split print profile',
+        desc: 'Only 4H and 6H. The model matches the Regular box of the same size (we compared 4H 2×2 vertex by vertex). What differs is how you print it: use the "ModuBOX_Split – Bambu Print Setting" 3MF for your printer in 01_Boxes and grids/01_Print files.' },
+      { id: 'blank', label: 'Blank', prefix: 'Blanks/', heights: true, sample: '2H, 1×1',
+        short: 'Solid block for custom inserts',
+        desc: 'A solid block with the same feet, in half-grid sizes. Import it into your CAD tool and cut a pocket shaped to your tool or part.' },
+      { id: 'fblank', label: 'Filler blank', prefix: 'organizers/Filler blanks', heights: true, sample: '2H, 1×1',
+        short: 'Solid filler (organizers)',
+        desc: 'Solid filler blocks from the organizers folder, in half-grid sizes up to 1×8. Use them to fill empty spots so the other boxes cannot slide around.' },
+      { id: 'fbowl', label: 'Filler bowl', prefix: 'organizers/Filler Bowls', heights: true, sample: '2H, 1×1',
+        short: 'Block with a scooped bowl',
+        desc: 'A solid block with a rounded bowl scooped out, so small parts like screws and washers are easy to pick out with a finger.' },
+      { id: 'grid', label: 'Base grid', prefix: '01_Boxes and grids/Base grids', heights: false, sample: '2×2',
+        short: 'Floor plate boxes lock into',
+        desc: 'The 3.85 mm floor plate that every box locks into. Tile several smaller plates for a big drawer, then add Edgegrids for the leftover gap.' },
+      { id: 'edge', label: 'Edgegrid', prefix: '01_Boxes and grids/Edgegrids', heights: false, sample: '3 grid + 20 mm',
+        short: 'Fills the gap to the wall', axes: ['cells', 'plus'],
+        axisLabel: 'Grid count × gap', axisHint: '(rows: how many grid cells it runs along · columns: leftover gap in mm)', corner: 'N\\mm',
+        desc: 'A strip that fills the space between your base grids and the drawer wall. Divide the drawer size by 55: the whole number is the grid count and the remainder is the gap in mm. Example: 300 mm = 5 grids + 25 mm.' },
+    ],
+    finder: { style: 'regular', h: 2, view: 'top' },
+    theme: savedTheme(),
+    localRoot: (() => { try { return localStorage.getItem('localRoot') || ''; } catch { return ''; } })(),
+    editRoot: false,
+    docs: {},
+
+    async init() {
+      this.versions = await (await fetch('data/versions.json')).json();
+      this.guides = await (await fetch('data/guides.json')).json();
+      this.docs = await (await fetch('data/docs.json')).json();
+      this.version = this.versions[0].version;
+      await this.loadVersion();
+      this.$watch('q', () => { this.limit = 100; });
+      this.$watch('tab', t => t === 'search' && this.$nextTick(() => this.$refs.q.focus()));
+      this.initViewer();
+      const h = new URLSearchParams(location.hash.slice(1));
+      if (h.get('f') && this.byPath[h.get('f')]) { this.select(this.byPath[h.get('f')]); this.tab = 'browse'; }
+      if (h.get('q')) { this.q = h.get('q'); this.tab = 'search'; }
+    },
+    async loadVersion() {
+      const ix = await (await fetch(`data/versions/${this.version}.json`)).json();
+      let id = 0; const items = [];
+      for (const f of ix.folders) for (const x of f.files) {
+        const it = { id: id++, folder: f.p, name: x.n, kind: x.k, size: x.s, a: x.a, cat: f.p.split('/')[0] };
+        const doc = this.docs[f.p + '/' + x.n];
+        it.hay = (f.p + '/' + x.n + (doc ? ' ' + doc.title + ' ' + doc.description + ' ' + doc.tags.join(' ') : '')).toLowerCase().replace(/_/g, ' ');
+        items.push(it);
+      }
+      // Frozen objects are skipped by Alpine's reactivity: much faster filtering over 7k items.
+      items.forEach(Object.freeze); ix.folders.forEach(Object.freeze);
+      this.items = Object.freeze(items); this.folders = Object.freeze(ix.folders);
+      this.byPath = Object.fromEntries(items.map(i => [i.folder + '/' + i.name, i]));
+      this.selected = null; this.ready = true;
+    },
+    get categories() { return [...new Set(this.items.map(i => i.cat))].sort(); },
+
+    // ---- finder ----
+    currentStyle() { return this.styles.find(s => s.id === this.finder.style); },
+    pickStyle(s) {
+      this.finder.style = s.id;
+      const hs = this.finderHeights();
+      if (s.heights && !hs.includes(this.finder.h)) this.finder.h = hs[0];
+    },
+    axes() { return this.currentStyle().axes || ['w', 'd']; },
+    styleItems() {
+      const s = this.currentStyle(), [ax, ay] = this.axes();
+      return this.items.filter(i => i.folder.startsWith(s.prefix) && i.kind === 'stl' && i.a[ax] != null && i.a[ay] != null);
+    },
+    cycleTheme() {
+      this.theme = { system: 'light', light: 'dark', dark: 'system' }[this.theme];
+      try { localStorage.setItem('theme', this.theme); } catch {}
+      applyTheme(this.theme);
+    },
+    saveRoot() { try { localStorage.setItem('localRoot', this.localRoot); } catch {} this.editRoot = false; },
+    finderHeights() { return this.memo('h', [this.version, this.finder.style], () => [...new Set(this.styleItems().map(i => i.a.h))]); },
+    matrix() { return this.memo('m', [this.version, this.finder.style, this.finder.h], () => this._matrix()); },
+    _matrix() {
+      const s = this.currentStyle();
+      let its = this.styleItems();
+      if (s.heights) its = its.filter(i => i.a.h === this.finder.h);
+      const [ax, ay] = this.axes();
+      const map = {}; for (const i of its) map[i.a[ax] + 'x' + i.a[ay]] = i;
+      const ws = [...new Set(its.map(i => i.a[ax]))].sort((a, b) => a - b);
+      const ds = [...new Set(its.map(i => i.a[ay]))].sort((a, b) => a - b);
+      return { map, ws, ds, count: its.length };
+    },
+    heightMm,
+
+    // ---- search ----
+    memo(slot, key, fn) {
+      const k = JSON.stringify(key);
+      if (MEMO[slot]?.k !== k) MEMO[slot] = { k, v: fn() };
+      return MEMO[slot].v;
+    },
+    results() { return this.memo('r', [this.version, this.q, this.cat, this.kind], () => this._results()); },
+    _results() {
+      const toks = this.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      return this.items.filter(it => {
+        if (this.cat && it.cat !== this.cat) return false;
+        if (this.kind && it.kind !== this.kind) return false;
+        for (const t of toks) {
+          let m;
+          if ((m = t.match(/^(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)$/))) {
+            const [w, d] = [+m[1], +m[2]];
+            if (!((it.a.w === w && it.a.d === d) || (it.a.w === d && it.a.d === w))) return false;
+          } else if ((m = t.match(/^([1-6])h$/))) {
+            if (it.a.h !== +m[1]) return false;
+          } else if ((m = t.match(/^(?:ø|o|d)(\d+)$/))) {
+            if (it.a.dia !== +m[1]) return false;
+          } else if (/^\d+(?:\.\d+)?$/.test(t)) {          // bare number: whole-number match only
+            if (!new RegExp(`(^|[^\\d.])${t.replace('.', '\\.')}([^\\d.]|$)`).test(it.hay)) return false;
+          } else if (!it.hay.includes(t.replace(/_/g, ' '))) return false;
+        }
+        return true;
+      });
+    },
+
+    // ---- browse ----
+    tree() {
+      if (TREE_FOR === this.version) return TREE;
+      const nodes = {};
+      for (const f of this.folders) {
+        if (!f.p) continue;
+        const parts = f.p.split('/');
+        parts.forEach((n, i) => {
+          const p = parts.slice(0, i + 1).join('/');
+          nodes[p] ??= { path: p, name: n, depth: i, parent: parts.slice(0, i).join('/'), total: 0, hasKids: false };
+          if (i > 0) nodes[parts.slice(0, i).join('/')].hasKids = true;
+          nodes[p].total += i === parts.length - 1 ? f.files.length : 0;
+        });
+      }
+      for (const n of Object.values(nodes).sort((a, b) => b.depth - a.depth)) if (n.parent) nodes[n.parent].total += n.total;
+      TREE = Object.values(nodes).sort((a, b) => a.path.localeCompare(b.path, undefined, { sensitivity: 'base' }));
+      TREE_FOR = this.version;
+      return TREE;
+    },
+    treeRows() {
+      return this.tree().filter(n => {
+        let p = n.parent; while (p) { if (!this.open[p]) return false; p = p.split('/').slice(0, -1).join('/'); }
+        return true;
+      });
+    },
+    toggle(r) { this.folder = r.path; if (r.hasKids) this.open[r.path] = !this.open[r.path]; },
+    folderFiles() { return this.memo('f', [this.version, this.folder], () => this.items.filter(i => i.folder === this.folder)); },
+    goFolder(p) {
+      this.folder = p; this.tab = 'browse';
+      const parts = p.split('/'); parts.forEach((_, i) => this.open[parts.slice(0, i + 1).join('/')] = true);
+    },
+    guideWarn(g) {
+      if (!g?.warn) return '';
+      return typeof g.warn === 'string' ? g.warn : (g.warn[this.version] ? `In this release (${this.version}): ${g.warn[this.version]}` : '');
+    },
+    // label.alch.shop has no URL parameters, so we tell people which settings to pick.
+    labelHint() {
+      const s = this.selected;
+      if (!s || s.kind !== 'stl' || s.a.shape !== 'box' || !s.folder.startsWith(BOX)) return null;
+      const stack = s.folder.startsWith(BOX + 'Stackable');
+      const w = s.a.w;
+      return {
+        type: stack ? 'Stackable' : 'Regular',
+        width: Number.isInteger(w) ? `${w} wide` : `${w} wide (half grid)`,
+        note: Number.isInteger(w) ? 'Width is the first number in the file name (the front of the box).'
+          : 'This box is a half-grid width. If the generator does not offer it, pick the closest width it does.',
+      };
+    },
+    docFor(it) { return it ? this.docs[it.folder + '/' + it.name] : null; },
+    guideFor(p) {
+      if (p == null) return null;
+      const keys = Object.keys(this.guides).filter(k => !k.startsWith('_') && (p === k || p.startsWith(k + '/') || p.startsWith(k)));
+      keys.sort((a, b) => b.length - a.length);
+      return keys.length ? this.guides[keys[0]] : null;
+    },
+
+    // ---- detail ----
+    select(it) {
+      if (!it) return;
+      this.selected = it;
+      history.replaceState(null, '', '#f=' + encodeURIComponent(it.folder + '/' + it.name));
+      this.drawPreview(it.a);
+    },
+    crumbs() {
+      const parts = [this.root, ...this.selected.folder.split('/')];
+      return parts.map((n, i) => ({ name: n, path: parts.slice(1, i + 1).join('/') }));
+    },
+    fullPath() {
+      const r = this.localRoot.trim();
+      if (!r) return [this.root, this.selected.folder, this.selected.name].join('/');
+      const win = /^[a-z]:\\|\\/i.test(r);
+      const rel = [this.selected.folder, this.selected.name].join('/');
+      return r.replace(/[\\/]+$/, '') + (win ? '\\' + rel.replace(/\//g, '\\') : '/' + rel);
+    },
+    dims() {
+      const a = this.selected.a;
+      if (a.w == null) return '';
+      let s = `${a.w} × ${a.d} grid ≈ ${Math.round(a.w * GRID)} × ${Math.round(a.d * GRID)} mm`;
+      if (a.h) s += ` · ${a.h}H = ${heightMm(a.h)} mm tall`;
+      return s;
+    },
+    attrList() {
+      const a = this.selected.a, L = [];
+      L.push(['Type', this.selected.kind.toUpperCase()]);
+      L.push(['Size on disk', this.fmtSize(this.selected.size)]);
+      if (a.taper) L.push(['Taper', a.taper]);
+      if (a.dia) L.push(['Diameter', 'Ø' + a.dia + ' mm']);
+      if (a.len) L.push(['Length', a.len + ' mm']);
+      if (a.paper) L.push(['Paper', a.paper]);
+      if (a.cells) L.push(['Runs along', a.cells + ' grid']);
+      if (a.plus) L.push(['Gap filled', a.plus + ' mm']);
+      if (a.thick) L.push(['Panel thickness', a.thick + ' mm']);
+      if (a.printer) L.push(['Printer', a.printer]);
+      if (a.hRange) L.push(['Heights', a.hRange.join('H–') + 'H']);
+      return L;
+    },
+    otherHeights() {
+      const s = this.selected; if (!s || s.a.h == null || s.a.w == null) return [];
+      const fam = s.folder.split('/').slice(0, -1).join('/');
+      return this.items.filter(i => i !== s && i.a.w === s.a.w && i.a.d === s.a.d && i.a.h != null && i.a.h !== s.a.h
+        && i.folder.split('/').slice(0, -1).join('/') === fam && i.kind === s.kind).sort((a, b) => a.a.h - b.a.h);
+    },
+    copy(text, which = 'path') { navigator.clipboard?.writeText(text); this.copied = which; setTimeout(() => this.copied = '', 1200); },
+    fmtSize(b) { return b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' KB'; },
+    kindColor(k) {
+      return { stl: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200', '3mf': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200',
+        pdf: 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200' }[k] || 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300';
+    },
+
+    // ---- 3D preview (shape is generated from the name; no original geometry is used) ----
+    initViewer() {
+      const cv = this.$refs.cv;
+      const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+      r.setPixelRatio(devicePixelRatio);
+      const scene = new THREE.Scene();
+      const cam = new THREE.PerspectiveCamera(35, 1, 1, 5000);
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.9));
+      const sun = new THREE.DirectionalLight(0xffffff, 0.7); sun.position.set(1, 2, 1.5); scene.add(sun);
+      const group = new THREE.Group(); scene.add(group);
+      let rotY = -0.6, rotX = 0.55, drag = null, dist = 300;
+      cv.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId); });
+      cv.addEventListener('pointermove', e => { if (!drag) return; rotY += (e.clientX - drag[0]) * 0.01; rotX = Math.max(-0.2, Math.min(1.4, rotX + (e.clientY - drag[1]) * 0.01)); drag = [e.clientX, e.clientY]; });
+      cv.addEventListener('pointerup', () => drag = null);
+      const loop = () => {
+        const w = cv.clientWidth, h = cv.clientHeight;
+        if (cv.width !== w * devicePixelRatio) { r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+        if (!drag) rotY += 0.003;
+        cam.position.set(dist * Math.cos(rotX) * Math.sin(rotY), dist * Math.sin(rotX), dist * Math.cos(rotX) * Math.cos(rotY));
+        cam.lookAt(0, group.userData.cy || 0, 0);
+        r.render(scene, cam); requestAnimationFrame(loop);
+      };
+      loop();
+      VIEW = { group, setDist: d => dist = d };
+    },
+    drawPreview(a) {
+      const { group } = VIEW;
+      while (group.children.length) group.remove(group.children[0]);
+      if (!a.shape) return;
+      const W = (a.w ?? 1) * GRID - 0.2, D = (a.d ?? 1) * GRID - 0.2;
+      const mat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.6 });
+      const line = new THREE.LineBasicMaterial({ color: 0x78350f, transparent: true, opacity: 0.35 });
+      const add = (w, h, d, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); group.add(m); };
+      let H;
+      if (a.shape === 'grid') {
+        H = 3.85; add(W, H, D, 0, H / 2, 0);
+        const pts = [];
+        for (let i = 0; i <= a.w; i++) pts.push(new THREE.Vector3(-W / 2 + i * GRID, H + 0.1, -D / 2), new THREE.Vector3(-W / 2 + i * GRID, H + 0.1, D / 2));
+        for (let j = 0; j <= a.d; j++) pts.push(new THREE.Vector3(-W / 2, H + 0.1, -D / 2 + j * GRID), new THREE.Vector3(W / 2, H + 0.1, -D / 2 + j * GRID));
+        group.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), line));
+      } else if (a.shape === 'edge') {
+        const len = (a.cells || 1) * GRID; H = 3.85; add(a.plus || 10, H, len, 0, H / 2, 0);
+      } else {
+        H = a.h ? heightMm(a.h) : 21;
+        if (a.shape === 'blank') add(W, H, D, 0, H / 2, 0);
+        else {
+          const t = 1.6, fl = 2;
+          add(W, fl, D, 0, fl / 2, 0);
+          add(W, H, t, 0, H / 2, D / 2 - t / 2); add(W, H, t, 0, H / 2, -D / 2 + t / 2);
+          add(t, H, D - 2 * t, W / 2 - t / 2, H / 2, 0); add(t, H, D - 2 * t, -W / 2 + t / 2, H / 2, 0);
+        }
+        const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), line); e.position.y = H / 2; group.add(e);
+      }
+      group.userData.cy = H / 3;
+      VIEW.setDist(Math.max(W, D, H, 60) * 2.3);
+    },
+  };
+}
+</script>
+</body>
+</html>

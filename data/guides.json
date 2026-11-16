@@ -1,0 +1,144 @@
+{
+  "_comment": "Hand-written notes shown next to files. Key = folder path prefix; the longest matching prefix wins. 'draft: true' means not yet checked against Alexander's docs/videos.",
+  "01_Boxes and grids": {
+    "title": "Boxes & grids",
+    "draft": true,
+    "summary": "The core system. Every ModuBOX sits on a 55 mm grid. Heights go in 18 mm steps: 1H = 21 mm, 2H = 39, 3H = 57, 4H = 75, 5H = 93, 6H = 111 mm.",
+    "steps": [
+      "Print a Base grid (or several) that fills your drawer or case floor.",
+      "If the drawer isn't an exact multiple of 55 mm, add Edgegrids: pick the one for your grid count plus the leftover gap in mm.",
+      "Pick a box style (Regular, HalfGrid, Stackable, Split), height, and footprint (W x D in grid units).",
+      "Bambu users: the 01_Print files folder has ready-made 3MF projects for each printer."
+    ]
+  },
+  "01_Boxes and grids/01_Print files": {
+    "title": "Bambu print settings",
+    "draft": true,
+    "summary": "Ready-to-slice Bambu Studio projects with tested settings. Pick the file for your printer (A1, A1 Mini, P1P, P1S, X1C, H2D, H2S, H2C), then swap in the STL you need.",
+    "steps": []
+  },
+  "01_Boxes and grids/Base grids": {
+    "title": "Base grids",
+    "draft": true,
+    "summary": "Floor plates the boxes lock into. Named BaseGrid_WxD, where W and D are grid units (55 mm each). Large drawers: tile several smaller grids instead of printing one huge plate.",
+    "steps": []
+  },
+  "01_Boxes and grids/Edgegrids": {
+    "title": "Edgegrids",
+    "draft": true,
+    "summary": "Fill strips for the gap between your base grids and the drawer wall. Name: Edgegrid_<N> Grid + <gap>mm, where N is how many grid cells it runs along and the gap is the extra width in mm.",
+    "steps": [
+      "Measure the drawer, divide by 55: the whole number is your grid count, and the remainder in mm is the gap.",
+      "Example: 300 mm ÷ 55 = 5 grids + 25 mm, so use Edgegrid_5 Grid + 25mm (or split the gap across both sides)."
+    ]
+  },
+  "01_Boxes and grids/ModuBOXES/Regular": {
+    "title": "Regular ModuBOX",
+    "draft": true,
+    "summary": "The standard open box. Folders by height. Names are ModuBOX_<n>H<mm>_<W>x<D>. Note: the 4H folder's files have no height in the name (ModuBOX_WxD).",
+    "steps": []
+  },
+  "01_Boxes and grids/ModuBOXES/HalfGrid": {
+    "title": "HalfGrid ModuBOX",
+    "draft": true,
+    "summary": "Boxes in 0.5-grid (27.5 mm) increments, for narrow items and filling odd spaces.",
+    "steps": []
+  },
+  "01_Boxes and grids/ModuBOXES/Stackable": {
+    "title": "Stackable ModuBOX",
+    "draft": true,
+    "summary": "Like Regular, but with a chamfered inner lip along the top edge, so another box sits on top and stays put.",
+    "steps": [],
+    "warn": {
+      "2026-05-26": "Files in Stack_4H75mm are named ..._5H93_... and files in Stack_5H93mm are named ..._6H93_.... The folder is right: they measure 75 mm and 93 mm tall."
+    }
+  },
+  "01_Boxes and grids/ModuBOXES/Stackable_Halfgrid": {
+    "title": "Stackable HalfGrid",
+    "draft": true,
+    "summary": "Stackable boxes in 0.5-grid increments.",
+    "steps": []
+  },
+  "01_Boxes and grids/ModuBOXES/Split": {
+    "title": "Split ModuBOX",
+    "draft": true,
+    "summary": "Only 4H and 6H. The STL matches the Regular box of the same size (checked on 4H 2x2). What differs is the print profile: use 'ModuBOX_Split - Bambu Print Setting - <printer>.3mf' from 01_Print files.",
+    "steps": []
+  },
+  "Blanks": {
+    "title": "Blanks",
+    "draft": true,
+    "summary": "Solid HalfGrid blocks for modelling your own inserts: import into your CAD tool and cut a pocket for a specific tool.",
+    "steps": []
+  },
+  "organizers": {
+    "title": "Organizers",
+    "draft": true,
+    "summary": "Purpose-built inserts on the same grid: bit holders, Morse taper (MT1–MT5) and R8 tool holders, sandpaper holders, bowls, cups and more. The size in the folder name is the footprint in grid units.",
+    "steps": [
+      "MT and R8 holders are named <W>x<D> <taper> Ø<diameter> X<length>: match Ø to the largest diameter of the tool and X to its length."
+    ]
+  },
+  "organizers/Sandpaper": {
+    "title": "Sandpaper holders",
+    "draft": true,
+    "summary": "One folder per sheet or disc size (70x200, 81x133, Mouse, Ø125, Ø150, Ø180), each in heights 1H–6H.",
+    "steps": []
+  },
+  "Printed Case": {
+    "title": "Printed case",
+    "draft": true,
+    "summary": "A fully 3D-printed carry case. Frames are named Frame_<n>H_<W>x<D>. Lids come solid or transparent (2/3/4 mm). Check 'Printed case_Hardware requirements.png' for the bolts and nuts before ordering.",
+    "steps": [
+      "Print a frame for your box height and footprint.",
+      "Add handles, a lid (or transparent lid), lock parts and labels.",
+      "Bambu users: the Bambufiles folder has plated projects."
+    ]
+  },
+  "Wood Case_v2": {
+    "title": "Wood case v2",
+    "draft": true,
+    "summary": "A plywood case with printed corners, hinges, handles, lips and locks. One cut-list PDF exists per sheet thickness (6–12 mm), and each has a hardware list and panel-size tables by case width and height (2H–6H). The templates are drilling/routing guides for the panels.",
+    "steps": [
+      "Open the cut-list PDF for your plywood thickness in 'cut list and HW'.",
+      "Print the templates (sides, front and back, lid-front, hinge-lid) for that thickness.",
+      "Print the corners for your case height (2H–6H), plus hinges, handles, lips, locks and lock latches."
+    ]
+  },
+  "Case v1": {
+    "title": "Case v1 (wood)",
+    "draft": true,
+    "summary": "The original wooden case (2020–21 design, 9 mm stock). 'ModuBOX Case.PDF' has the panel list, views and fastener table, and sheet 2 is a drill guide to print at 1:1. 'ModuBOX double case frame.PDF' is a frame that stacks two cases. Printed corner protectors, stoppers and lock parts are in 'case parts'.",
+    "steps": []
+  },
+  "Case cart (for v1)": {
+    "title": "Case cart (for v1)",
+    "draft": true,
+    "summary": "A rolling cart holding six v1 cases on drawer runners. 'ModuBOX case cart.pdf' is a 12-page illustrated guide with a cut and hardware list. Print 'drawer Case holder.STL' for the holders.",
+    "steps": []
+  },
+  "tower (for v1)": {
+    "title": "Tower (for v1)",
+    "draft": true,
+    "summary": "A tower for stacking v1 cases. Drawing: 'ModuBOX - Tower.PDF'.",
+    "steps": []
+  },
+  "assortment cart": {
+    "title": "Assortment cart",
+    "draft": true,
+    "summary": "A rolling drawer cart in 6, 9 or 12 units. Each size has its own plan set in 'Plans' (16–18 pages, mm and inch, no hardware list). The printed glue jig, drill guides, handle and handle-hole templates are in 'jigs and templates', with Bambu projects per printer.",
+    "steps": []
+  },
+  "fully printed drawer unit": {
+    "title": "Fully printed drawer unit",
+    "draft": true,
+    "summary": "A drawer unit printed entirely, in a 4x4 or 5x5 footprint, with 2–4 drawers of 3H or 4H height. '_flatt' files are the print-oriented versions.",
+    "steps": []
+  },
+  "work table": {
+    "title": "Work table",
+    "draft": true,
+    "summary": "A large work table over two drawer cabinets on casters. 'Modubox Work table.PDF' is 7 A3 sheets in mm. The router templates in 'router attachments' are separate extras that the PDF doesn't mention.",
+    "steps": []
+  }
+}
