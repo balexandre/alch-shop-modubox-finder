@@ -140,7 +140,7 @@
           <div class="text-xs font-medium uppercase tracking-wide text-stone-500 mb-1.5">2 · Height</div>
           <div class="flex flex-wrap gap-1.5">
             <template x-for="h in [1,2,3,4,5,6]" :key="h">
-              <button @click="finder.h = h; finder.pick = null" :disabled="!finderHeights().includes(h)"
+              <button @click="pickHeight(h)" :disabled="!finderHeights().includes(h)"
                 class="w-20 py-1.5 rounded-md text-sm border disabled:opacity-30 disabled:cursor-not-allowed"
                 :class="finder.h === h ? 'bg-stone-900 border-stone-900 text-white dark:bg-stone-100 dark:text-stone-900' : 'border-stone-300 dark:border-stone-700'">
                 <span x-text="h + 'H'"></span> <span class="text-xs opacity-60" x-text="heightMm(h) + 'mm'"></span>
@@ -429,7 +429,7 @@
         <canvas x-ref="cv" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
         <div x-show="!selected || !selected.a.shape" class="absolute inset-0 flex items-center justify-center text-sm text-stone-500 text-center px-6"
           x-text="previewMsg()"></div>
-        <div x-show="selected && selected.a.shape" class="absolute bottom-2 left-3 text-[10px] text-stone-500">Approximate shape from the file name · drag to rotate</div>
+        <div x-show="selected && selected.a.shape" class="absolute bottom-2 left-3 text-[10px] text-stone-500">Approximate shape from the file name · drag to rotate, drag up to see underneath</div>
       </div>
       <div x-show="selected" class="p-4 space-y-3 text-sm">
           <div>
@@ -663,6 +663,18 @@ function app() {
       this.finder.style = s.id;
       const hs = this.finderHeights();
       if (s.heights && !hs.includes(this.finder.h)) this.finder.h = hs[0];
+      this.finderAutoSelect();
+    },
+    pickHeight(h) { this.finder.h = h; this.finderAutoSelect(); },
+    // Keep the preview and details in step with the finder: select the same footprint in the new
+    // style/height if it exists, otherwise 2x2, otherwise the size closest to it.
+    finderAutoSelect() {
+      const m = this.matrix(), [ax, ay] = this.axes(), cur = this.selected?.a;
+      const keys = Object.keys(m.map); if (!keys.length) return;
+      const want = cur && cur[ax] != null ? [cur[ax], cur[ay]] : [2, 2];
+      const key = m.map[want[0] + 'x' + want[1]] ? want[0] + 'x' + want[1]
+        : keys.sort((a, b) => { const d = k => { const [x, y] = k.split('x').map(Number); return Math.abs(x - want[0]) + Math.abs(y - want[1]); }; return d(a) - d(b); })[0];
+      this.select(m.map[key]);
     },
     axes() { return this.currentStyle().axes || ['w', 'd']; },
     styleItems() {
@@ -967,10 +979,11 @@ function app() {
       const cam = new THREE.PerspectiveCamera(35, 1, 1, 5000);
       scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.9));
       const sun = new THREE.DirectionalLight(0xffffff, 0.7); sun.position.set(1, 2, 1.5); scene.add(sun);
+      const under = new THREE.DirectionalLight(0xffffff, 0.45); under.position.set(-1, -2, -1); scene.add(under);   // so the underside isn't black
       const group = new THREE.Group(); scene.add(group);
       let rotY = -0.6, rotX = 0.55, drag = null, dist = 300;
       cv.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId); });
-      cv.addEventListener('pointermove', e => { if (!drag) return; rotY += (e.clientX - drag[0]) * 0.01; rotX = Math.max(-0.2, Math.min(1.4, rotX + (e.clientY - drag[1]) * 0.01)); drag = [e.clientX, e.clientY]; });
+      cv.addEventListener('pointermove', e => { if (!drag) return; rotY += (e.clientX - drag[0]) * 0.01; rotX = Math.max(-1.2, Math.min(1.45, rotX + (e.clientY - drag[1]) * 0.01)); drag = [e.clientX, e.clientY]; });   // full tilt: drag up to look underneath
       cv.addEventListener('pointerup', () => drag = null);
       const loop = () => {
         const w = cv.clientWidth, h = cv.clientHeight;

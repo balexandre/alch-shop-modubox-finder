@@ -29,6 +29,8 @@ The full per-file diff is in `changes/<version>.md`.
 - Printer presets: the H2D is now listed twice, "H2D, single nozzle" (325 × 320 mm) and "H2D, both nozzles" (300 × 320 mm), from Bambu's specs. The old "H2D (both nozzles)" entry had the single-nozzle size and moves to the single-nozzle option.
 - Shareable views: the URL is `#<view>` (`#find`, `#plan`, `#search`, `#browse`, `#changes`), plus `&f=<file>`, `&q=<search>` or `&d=<folder>`. Tab changes add a history entry, so Back and Forward work. Old `#f=` and `#q=` links still open.
 - The footer moved out of the side panel to the bottom of every page (it was missing on Plan a drawer). Clicking "Buy the files" or the footer alch.shop link releases a few red hearts that fade away; none appear if the system is set to reduce motion.
+- Find a box: choosing a style or height now also selects a box (same footprint when it exists, otherwise 2×2 or the nearest size), so the 3D preview and details always follow. Before, only the size squares did.
+- 3D preview: you can tilt below the model (drag up) to see the underside, with a soft light from below.
 - Footer invites contributions (fork, PR, issues). Added a PR template and issue forms.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.
