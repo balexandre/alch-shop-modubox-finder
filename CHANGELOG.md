@@ -21,5 +21,6 @@ The full per-file diff is in `changes/<version>.md`.
 - Public site shows a one-time "this is an index, not a download" notice with an "I understand" button (hidden on localhost), and Browse explains that files aren't hosted.
 - The theme button is now the rightmost header control.
 - Fixed: Browse crashed on load (tree read before the index loaded), the detail panel threw Alpine x-for errors, and Find a box could show 0 files from a stale cache. Shared links now open Browse at the file's folder. Added `tools/check_site.mjs` (headless smoke test).
+- The preview placeholder now depends on the file type (PDF → browser or PDF reader, PNG → image viewer, 3MF → Bambu Studio, STL → slicer).
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.

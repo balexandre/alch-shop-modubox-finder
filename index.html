@@ -262,7 +262,7 @@
       <div class="relative bg-gradient-to-b from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900 h-56">
         <canvas x-ref="cv" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
         <div x-show="!selected || !selected.a.shape" class="absolute inset-0 flex items-center justify-center text-sm text-stone-500 text-center px-6"
-          x-text="selected ? 'No preview for this part. Open the file in your slicer.' : 'Pick a file to see where it is'"></div>
+          x-text="previewMsg()"></div>
         <div x-show="selected && selected.a.shape" class="absolute bottom-2 left-3 text-[10px] text-stone-500">Approximate shape from the file name · drag to rotate</div>
       </div>
       <div x-show="selected" class="p-4 space-y-3 text-sm">
@@ -543,6 +543,16 @@ function app() {
     get lh() { return this.labelHint() || { type: '', width: '', note: '' }; },
     get fguide() { return this.guideFor(this.folder) || EMPTY_GUIDE; },
     get sguide() { return this.guideFor(this.sel.folder) || EMPTY_GUIDE; },
+    // Placeholder text for the preview area, depending on what kind of file is selected.
+    previewMsg() {
+      const k = this.selected?.kind;
+      if (!k) return 'Pick a file to see where it is';
+      return {
+        pdf: 'PDF document. Open it from your copy in any browser or PDF reader.',
+        image: 'Image. Open it from your copy in any browser or image viewer.',
+        '3mf': 'Bambu Studio project. Open it from your copy in Bambu Studio (or another slicer that reads 3MF).',
+      }[k] || 'No preview for this part. Open the STL from your copy in your slicer.';
+    },
     docFor(it) { return it ? this.docs[it.folder + '/' + it.name] : null; },
     guideFor(p) {
       if (p == null) return null;
