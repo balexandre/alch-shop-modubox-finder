@@ -33,7 +33,7 @@ await p.getByRole('button', { name: 'Browse', exact: true }).first().click(); aw
 await p.getByRole('button', { name: 'Plan a drawer', exact: true }).first().click();
 const nums = p.locator('div[x-show="tab === \'plan\'"] input[type=number]');
 await nums.nth(0).fill('560'); await nums.nth(1).fill('470'); await nums.nth(2).fill('120'); await p.waitForTimeout(400);
-if (await p.locator('svg [data-path]').count() < 1) errs.push('Plan a drawer drew no pieces');
+if (await p.locator('svg [data-piece]').count() < 1) errs.push('Plan a drawer drew no pieces');
 await shot('5-plan');
 await p.goto(U + '#f=' + encodeURIComponent('Case cart (for v1)/ModuBOX case cart.pdf')); await p.reload(); await p.waitForTimeout(2000); await shot('6-deeplink');
 
