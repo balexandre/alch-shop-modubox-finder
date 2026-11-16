@@ -28,6 +28,8 @@ where it is* inside the Master set download. Live: https://balexandre.github.io/
 - `changes/<date>.md`: automatic file diff against the previous release. `CHANGELOG.md`: human summary.
 - `img/styles/<style>{,-under,-section}.png`: style pictures (top, underside, cut-away). `favicon.svg` matches the header logo.
 - `tools/build_index.py`: scans a local Master set, writes `data/versions/*`, `docs/catalog-*`, `changes/*`.
+- `tools/naming_issues.mjs`: measures the files flagged with `a.warn` and writes the naming-issues list with proposed names.
+  It edits the name without its extension (the size pattern can't match before ".STL").
 - `tools/render_thumbs.mjs`: dependency-free STL renderer for the style pictures (`PICKS` map = representative files).
 - `tools/check_site.mjs`: headless Chromium smoke test (Playwright). Clicks through every tab and the planner, and
   reports console/page errors. The file header explains running it on WSL without sudo.
@@ -78,8 +80,9 @@ to Browse with a file selected opens its folder.
 1. Download the new Master set and unzip it somewhere.
 2. `python3 -I tools/build_index.py --src "<path>" --version YYYY-MM-DD --label "<Month Dth release>"`.
 3. Read `changes/YYYY-MM-DD.md` and the new `docs/catalog-YYYY-MM-DD.md`.
-4. Naming issues: list files with `a.warn` in the new index, measure their STL bounding boxes, and write
-   `docs/naming-issues-YYYY-MM-DD.md/.csv`. (No script in the repo yet. In 2026-05-26 this was done ad hoc.)
+4. `node tools/naming_issues.mjs YYYY-MM-DD "<path>"`: measures every file flagged with `a.warn`, proposes the corrected
+   name and writes `docs/naming-issues-YYYY-MM-DD.md/.csv`. Look at any row with status `check` by hand.
+   If there are none, the site shows no naming-issues link for that release (it counts `a.warn`).
 5. Add new PDFs to `data/docs.json` (title and short description only). Version-key any new guide warnings.
 6. Update `data/guides.json` for new or renamed folders and the parsing rules in `build_index.py` for new names.
    Re-run `tools/render_thumbs.mjs` if a style's geometry changed.

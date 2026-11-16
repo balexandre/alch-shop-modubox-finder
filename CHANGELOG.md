@@ -31,6 +31,7 @@ The full per-file diff is in `changes/<version>.md`.
 - The footer moved out of the side panel to the bottom of every page (it was missing on Plan a drawer). Clicking "Buy the files" or the footer alch.shop link releases a few red hearts that fade away; none appear if the system is set to reduce motion.
 - Find a box: choosing a style or height now also selects a box (same footprint when it exists, otherwise 2×2 or the nearest size), so the 3D preview and details always follow. Before, only the size squares did.
 - 3D preview: you can tilt below the model (drag up) to see the underside, with a soft light from below.
+- Added `tools/naming_issues.mjs`. It regenerates the naming-issues list from the index plus your local Master set, and reproduces the 2026-05-26 list exactly (161 files, all confirmed by measurement).
 - Footer invites contributions (fork, PR, issues). Added a PR template and issue forms.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.
