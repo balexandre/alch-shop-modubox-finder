@@ -28,6 +28,7 @@ The full per-file diff is in `changes/<version>.md`.
 - Plan a drawer: the layout now uses the full page width and up to 75% of the screen height. It was drawn at 1 px per mm because `viewBox` wasn't applied. Thin strips have a wider invisible click area, and the clicked piece shows under the drawing with Copy path and Show in Browse. Corners can be filled: the plan adds a 1-grid edge piece per side and says what lengths to cut in the slicer. The file list shows these notes, and Copy and CSV include them.
 - Printer presets: the H2D is now listed twice, "H2D, single nozzle" (325 × 320 mm) and "H2D, both nozzles" (300 × 320 mm), from Bambu's specs. The old "H2D (both nozzles)" entry had the single-nozzle size and moves to the single-nozzle option.
 - Shareable views: the URL is `#<view>` (`#find`, `#plan`, `#search`, `#browse`, `#changes`), plus `&f=<file>`, `&q=<search>` or `&d=<folder>`. Tab changes add a history entry, so Back and Forward work. Old `#f=` and `#q=` links still open.
+- The footer moved out of the side panel to the bottom of every page (it was missing on Plan a drawer). Clicking "Buy the files" or the footer alch.shop link releases a few red hearts that fade away; none appear if the system is set to reduce motion.
 - Footer invites contributions (fork, PR, issues). Added a PR template and issue forms.
 - Optional local Master set path: "Copy path" then gives the full path on your computer.
 - Guides in `data/guides.json` are drafts written from the folder structure. They still need checking against Alexander's videos and PDFs.
